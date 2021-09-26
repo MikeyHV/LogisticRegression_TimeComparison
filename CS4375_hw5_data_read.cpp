@@ -425,6 +425,27 @@ std::vector<double> vecSubtract(std::vector<double> vec1, std::vector<double> ve
     return ret;
 }
 
+double accuracy(std::vector< std::vector<double> > test, std::vector< std::vector<double> > preds){
+    /**
+     * two nx1 vectors
+     **/
+    double acc = 0;
+    vector<double> corr;
+
+    for(int i = 0; i < test.size(); i++){
+        if(preds[i][0] < 0.5){
+            if(test[i][0] == 0){
+                acc++;
+            }
+        }else{
+            if(test[i][0] == 1){
+                acc++;
+            }
+        }
+    }
+    return acc/test.size();
+}
+
 
 /*
 * features: x values, 2d vector, everything except survived, nx3 array
@@ -528,8 +549,20 @@ int main() {
        // vector< vector<double> >  train(vector< vector<double> > features, vector< vector<double> > labels, vector< vector<double> >  weights, int lr, int iters) {
 
         vector< vector<double> > weights = { {0} };
-        vector< vector<double> > helpme = trainModel(featuresTrain, labelsTrain, weights, 0.2, 10000);
+        vector< vector<double> > trainedWeights = trainModel(featuresTrain, labelsTrain, weights, 0.2, 10000);
 
+        /**
+         * features is an array of size nx1
+         * weights is an array of size 1x1
+         * must return an array of size nx1
+         *
+         * int retMe = inner_product(features.begin(), features.begin(), weights.begin(), 0);
+         * retMe = sigmoid(retMe);
+         **/
+        
+        vector< vector<double> > preds = predict(featuresTest, trainedWeights);
+        vector< vector<double> > testSurvivedTrans = transpose1dto2d(testSurvived);
+        accuracy(testSurvivedTrans, preds);
 
 
         std::cout << "haha" << std::endl;
