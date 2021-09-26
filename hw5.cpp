@@ -3,11 +3,31 @@
 #include <fstream>
 #include <cmath>
 #include <string>
+#include <math.h>
 using namespace std;
 
-std::vector<X> train(features, labels, weights, lr, iters){
-    
+vector<double> updateWeights(vector<double> features,vector<int> labels,vector<double> weights,int lr){
 
+}
+
+double costFunction(vector<double> features, vector<int>labels, vector<double>weights){
+
+}
+
+double sigmoid(int z){
+    return 1.0/(1 + exp(-z));
+}
+
+vector<double> train(vector<double> features,vector<int> labels,vector<double> weights,int lr, int iters){
+    vector<double> hist;
+
+    for(int i = 0; i < iters; i++){
+        weights = updateWeights(features, labels, weights, lr);
+
+        double cost = costFunction(features, labels, weights);
+        hist.push_back(cost);
+    }
+    return weights;
 }
 
 int main(int argc, char **argv)
@@ -37,20 +57,4 @@ int main(int argc, char **argv)
     
     int numObservations = 0;
     
-    while (inFS.good())
-    {
-        getline(inFS, rm_in, ',');
-        getline(inFS, medv_in, '\n');
-        
-        rm.at(numObservations) = stof(rm_in);
-        medv.at(numObservations) = stof(medv_in);
-        
-        numObservations++;
-    }
-
-    cout << "Closing file Boston.csv." << endl;
-    inFS.close(); // Done with file, so close it
-    
-    rm.resize(numObservations);
-    medv.resize(numObservations);
 }
