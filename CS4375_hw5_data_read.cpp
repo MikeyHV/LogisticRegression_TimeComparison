@@ -37,6 +37,7 @@ std::vector<double> testAge(MAX_LEN);
 
 std::vector< std::vector<double> > testTemp(NUM_ROWS);
 
+
 enum Col {
     PCLASS = 0,
     SURVIVED,
@@ -218,6 +219,66 @@ int main() {
         std::vector< std::vector<double> > titanicProj = transpose(titanicProjTemp);
         std::vector< std::vector<double> > train = transpose(trainTemp);
         std::vector< std::vector<double> > test = transpose(testTemp);
+
+        //features
+
+        //2d, 1 row
+        std::vector< std::vector<double> > featuresTemp = {titanicProjTemp[PCLASS]};
+        std::vector< std::vector<double> > features = transpose(featuresTemp);
+
+        //copy first 900 elements 
+        std::vector< std::vector<double> > featuresTrain(900, std::vector<double>(1));
+        for (int i = 0; i < 900; i++) {
+            for (int j = 0; j < 1; j++) {
+                featuresTrain[i][j] = features[i][j];
+            }
+        }
+
+        //copy remaining elements
+        std::vector< std::vector<double> > featuresTest(0, std::vector<double>(0));
+        int testIndex = 0;
+        for (int i = 900; i < features.size(); i++) {
+            featuresTest.push_back(std::vector<double>(1));
+            for (int j = 0; j < 1; j++) {
+                featuresTest[testIndex][j] = features[i][j];
+            }
+            testIndex++;
+        }
+
+        //-----------------------------------------------------------------------------------
+        //labels
+
+        //labels = transpose(survived)
+        //split labels into train and test
+
+        std::vector< std::vector<double> > labelsTemp = { titanicProjTemp[SURVIVED] };
+        std::vector< std::vector<double> > labels = transpose(labelsTemp);
+
+        //labels train
+        //copy first 900 elements 
+
+        std::vector< std::vector<double> > labelsTrain(900, std::vector<double>(1));
+        for (int i = 0; i < 900; i++) {
+            for (int j = 0; j < 1; j++) {
+                labelsTrain[i][j] = labels[i][j];
+            }
+        }
+
+        //labels test
+
+        //copy remaining elements
+        std::vector< std::vector<double> > labelsTest(0, std::vector<double>(0));
+        testIndex = 0;
+        for (int i = 900; i < labels.size(); i++) {
+            labelsTest.push_back(std::vector<double>(1));
+            for (int j = 0; j < 1; j++) {
+                labelsTest[testIndex][j] = labels[i][j];
+            }
+            testIndex++;
+        }
+
+
+
 
 
         //perform log regression
