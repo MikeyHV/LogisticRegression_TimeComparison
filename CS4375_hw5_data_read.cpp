@@ -8,7 +8,7 @@
 
 
 const int MAX_LEN = 10000;
-const int NUM_COLS = 4;
+const int NUM_ROWS = 4; //for temp matrix, we will later transpose it
 
 //holds all values
 std::vector<double> pclass(MAX_LEN);
@@ -16,7 +16,8 @@ std::vector<double> survived(MAX_LEN);
 std::vector<double> sex(MAX_LEN);
 std::vector<double> age(MAX_LEN);
 
-std::vector< std::vector<double> > titanicProj(NUM_COLS);
+std::vector< std::vector<double> > titanicProjTemp(NUM_ROWS); //temp variable
+
 
 
 //train subset
@@ -25,7 +26,7 @@ std::vector<double> trainSurvived(MAX_LEN);
 std::vector<double> trainSex(MAX_LEN);
 std::vector<double> trainAge(MAX_LEN);
 
-std::vector< std::vector<double> > train(NUM_COLS);
+std::vector< std::vector<double> > trainTemp(NUM_ROWS);
 
 
 //test subset
@@ -34,7 +35,7 @@ std::vector<double> testSurvived(MAX_LEN);
 std::vector<double> testSex(MAX_LEN);
 std::vector<double> testAge(MAX_LEN);
 
-std::vector< std::vector<double> > test(NUM_COLS);
+std::vector< std::vector<double> > testTemp(NUM_ROWS);
 
 enum Col {
     PCLASS = 0,
@@ -42,6 +43,29 @@ enum Col {
     SEX,
     AGE
 };
+
+/*
+* returns the transpose of the vector passed in as an argument
+*/
+std::vector<std::vector<double> > transpose(std::vector<std::vector<double> > orig)
+{
+    if (orig.size() == 0) {
+        return std::vector<std::vector<double> >(); //empty
+    }
+
+    std::vector<std::vector<double> > transfVec(orig[0].size(), std::vector<double>());
+
+    for (int i = 0; i < orig.size(); i++)
+    {
+        for (int j = 0; j < orig[i].size(); j++)
+        {
+            transfVec[j].push_back(orig[i][j]);
+        }
+    }
+
+    return transfVec;   
+}
+
 
 /*
 * Need vectors:
@@ -125,26 +149,27 @@ void splitData(int trainSize, std::vector<T>& original, std::vector<T>& train, s
 }
 void create2dVecs() {
     //original
-    titanicProj[PCLASS] = pclass;
-    titanicProj[SURVIVED] = survived;
-    titanicProj[SEX] = sex;
-    titanicProj[AGE] = age;
+    titanicProjTemp[PCLASS] = pclass;
+    titanicProjTemp[SURVIVED] = survived;
+    titanicProjTemp[SEX] = sex;
+    titanicProjTemp[AGE] = age;
 
     //train (exclude SURVIEVED)
-    train[PCLASS] = trainPclass;
-    train[SEX] = trainSex;
-    train[AGE] = trainAge;
+    trainTemp[PCLASS] = trainPclass;
+    trainTemp[SEX] = trainSex;
+    trainTemp[AGE] = trainAge;
     
     //test (exclude SURVIEVED)
-    test[PCLASS] = testPclass;
-    test[SEX] = testSex;
-    test[AGE] = testAge;
+    testTemp[PCLASS] = testPclass;
+    testTemp[SEX] = testSex;
+    testTemp[AGE] = testAge;
 
 }
 
-/*
-* helper function, returns dot product of 2 vectors
-*/
+
+
+//helper function, returns dot product of 2 vectors
+
 std::vector<double> vecSubtract(std::vector<double> vec1, std::vector<double> vec2) {
     std::vector<double> ret = std::vector<double>();
     for (int i = 0; i < vec1.size(); i++) {
@@ -152,12 +177,14 @@ std::vector<double> vecSubtract(std::vector<double> vec1, std::vector<double> ve
     }
     return ret;
 }
+
+
 /*
 * features: x values, 2d vector, everything except survived, nx3 array
 * labels: 0 or 1, output of classification, nx1 integers
 * weights: a parameter, double, 1x3 array
 * lr: learning rate, double
-*/
+*
 std::vector<double> updateWeights(std::vector< std::vector<double> >& features, 
                                 std::vector<double>& labels, 
                                 std::vector<double>& weights, 
@@ -175,6 +202,7 @@ std::vector<double> updateWeights(std::vector< std::vector<double> >& features,
 
     return weights;
 }
+*/
 
 
 int main() {
@@ -186,6 +214,11 @@ int main() {
         splitData(900, age, trainAge, testAge);
 
         create2dVecs();
+
+        std::vector< std::vector<double> > titanicProj = transpose(titanicProjTemp);
+        std::vector< std::vector<double> > train = transpose(trainTemp);
+        std::vector< std::vector<double> > test = transpose(testTemp);
+
 
         //perform log regression
 
