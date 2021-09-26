@@ -491,7 +491,7 @@ int main() {
         //features
 
         //2d, 1 row
-        std::vector< std::vector<double> > featuresTemp = { titanicProjTemp[PCLASS] };
+        std::vector< std::vector<double> > featuresTemp(1, titanicProjTemp[PCLASS]); 
         std::vector< std::vector<double> > features = transpose(featuresTemp);
 
         //copy first 900 elements 
@@ -519,7 +519,7 @@ int main() {
         //labels = transpose(survived)
         //split labels into train and test
 
-        std::vector< std::vector<double> > labelsTemp = { titanicProjTemp[SURVIVED] };
+        std::vector< std::vector<double> > labelsTemp(1, titanicProjTemp[SURVIVED]);
         std::vector< std::vector<double> > labels = transpose(labelsTemp);
 
         //labels train
