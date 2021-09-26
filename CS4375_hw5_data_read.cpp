@@ -448,30 +448,6 @@ double accuracy(std::vector< std::vector<double> > test, std::vector< std::vecto
 }
 
 
-/*
-* features: x values, 2d vector, everything except survived, nx3 array
-* labels: 0 or 1, output of classification, nx1 integers
-* weights: a parameter, double, 1x3 array
-* lr: learning rate, double
-*
-std::vector<double> updateWeights(std::vector< std::vector<double> >& features,
-                                std::vector<double>& labels,
-                                std::vector<double>& weights,
-                                double lr) {
-    int n = features.size();
-
-    //make predictions
-    std::vector<double> predictions = predict(features, weights);
-
-
-    double gradient = dotProduct(transpose(features[0]), vecSubtract(predictions, labels));
-    gradient = gradient / n;
-    gradient = gradient * lr;
-    weights = vecSubtract(weights, gradient);
-
-    return weights;
-}
-*/
 
 
 int main() {
@@ -549,7 +525,8 @@ int main() {
 
        // vector< vector<double> >  train(vector< vector<double> > features, vector< vector<double> > labels, vector< vector<double> >  weights, int lr, int iters) {
 
-        vector< vector<double> > weights(0, vector<double>(0)); 
+        vector< vector<double> > weights(1, vector<double>(1));
+        weights[0][0] = 0.5;
         vector< vector<double> > trainedWeights = trainModel(featuresTrain, labelsTrain, weights, 0.2, 100);
 
         /**
