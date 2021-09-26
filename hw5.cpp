@@ -7,14 +7,18 @@
 #include <numeric>
 using namespace std;
 
-vector<double> predict(vector<double> features, vector<double> weights){
+double sigmoid(int z){
+    return 1.0/(1 + exp(-z));
+}
+
+vector<double> predict(vector< vector<double> > features,vector< vector<double> >  weights){
     int retMe = inner_product(features.begin(), features.begin(), weights.begin(), 0);
     retMe = sigmoid(retMe);
     vector<double> pls;
     return pls;
 }
 
-vector<double> updateWeights(vector<double> features,vector<double> labels,vector<double> weights,int lr){
+vector<double> updateWeights(vector< vector<double> > features,vector<double> labels,vector< vector<double> > weights,int lr){
     int obs = labels.size();
 
     vector<double> preds = predict(features, weights);
@@ -23,34 +27,32 @@ vector<double> updateWeights(vector<double> features,vector<double> labels,vecto
 
 }
 
-vector<double> classCost(vector<double> features, vector<double> labels){
-    for(int i = 0; i < features.size(); i++){
-        features[i] = log(features[i]) * labels[i] * -1;
+vector<double> classCost1(vector<double> preds, vector<double> labels){
+    for(int i = 0; i < preds.size(); i++){
+        preds[i] = log(preds[i]) * labels[i] * -1;
     }
-    return features;
+    return preds;
 }
 
-double costFunction(vector<double> features, vector<double>labels, vector<double>weights){
-    vector<double> cost1 = costFunction(features, labels, weights);
+vector<double> classCost2(vector<double> preds, vector<double> labels){
+    for(int i = 0; i < preds.size(); i++){
+        preds[i] = log(1 - preds[i]) * (1 - labels[i]);
+    }
+    return preds;
+}
 
-    vector<double> cost2 = cost2Function(features, labels, weights);
+double costFunction(vector< vector<double> > features, vector<double>labels,vector< vector<double> > weights){
+    vector<double>  preds = predict(features, weights);
+    
+    vector<double> cost1 = classCost1(preds, labels);
+
+    vector<double>  cost2 = classCost2(preds, labels);
     
     vector<double> finCost = costDiff(cost1, cost2);
 
     double cost = sumVec(finCost)/labels.size();
 
     return cost;
-}
-
-vector<double> cost2Function(vector<double> features, vector<double>labels, vector<double>weights){
-    for(int i = 0; i < features.size(); i++){
-        features[i] = log(1 - features[i]) * (1 - labels[i]) * -1;
-    }
-    return features;
-}
-
-double sigmoid(int z){
-    return 1.0/(1 + exp(-z));
 }
 
 vector<double> costDiff(vector<double> one, vector<double> two){
