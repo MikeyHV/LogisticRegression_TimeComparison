@@ -127,11 +127,11 @@ std::vector<std::vector<double> > transpose1dto2d(vector<double> orig) {
         return std::vector<std::vector<double> >(); //empty
     }
 
-    std::vector<std::vector<double> > transfVec(orig.size(), std::vector<double>(1));
+    std::vector<std::vector<double> > transfVec(orig.size(), std::vector<double>());
 
     for (int i = 0; i < orig.size(); i++)
     {
-        transfVec[0][i] = orig[i];
+        transfVec[0].push_back(orig[i]);
     }
 
     return transfVec;
@@ -310,7 +310,7 @@ std::vector<std::vector<double> > transpose(std::vector<std::vector<double> > or
         }
     }
 
-    return transfVec;   
+    return transfVec;
 }
 
 
@@ -405,7 +405,7 @@ void create2dVecs() {
     trainTemp[PCLASS] = trainPclass;
     trainTemp[SEX] = trainSex;
     trainTemp[AGE] = trainAge;
-    
+
     //test (exclude SURVIEVED)
     testTemp[PCLASS] = testPclass;
     testTemp[SEX] = testSex;
@@ -425,25 +425,26 @@ std::vector<double> vecSubtract(std::vector<double> vec1, std::vector<double> ve
     return ret;
 }
 
-double accuracy(std::vector< std::vector<double> > test, std::vector< std::vector<double> > preds){
+double accuracy(std::vector< std::vector<double> > test, std::vector< std::vector<double> > preds) {
     /**
      * two nx1 vectors
      **/
     double acc = 0;
     vector<double> corr;
 
-    for(int i = 0; i < test.size(); i++){
-        if(preds[i][0] < 0.5){
-            if(test[i][0] == 0){
+    for (int i = 0; i < test.size(); i++) {
+        if (preds[i][0] < 0.5) {
+            if (test[i][0] == 0) {
                 acc++;
             }
-        }else{
-            if(test[i][0] == 1){
+        }
+        else {
+            if (test[i][0] == 1) {
                 acc++;
             }
         }
     }
-    return acc/test.size();
+    return acc / test.size();
 }
 
 
@@ -453,15 +454,15 @@ double accuracy(std::vector< std::vector<double> > test, std::vector< std::vecto
 * weights: a parameter, double, 1x3 array
 * lr: learning rate, double
 *
-std::vector<double> updateWeights(std::vector< std::vector<double> >& features, 
-                                std::vector<double>& labels, 
-                                std::vector<double>& weights, 
+std::vector<double> updateWeights(std::vector< std::vector<double> >& features,
+                                std::vector<double>& labels,
+                                std::vector<double>& weights,
                                 double lr) {
     int n = features.size();
 
     //make predictions
     std::vector<double> predictions = predict(features, weights);
-    
+
 
     double gradient = dotProduct(transpose(features[0]), vecSubtract(predictions, labels));
     gradient = gradient / n;
@@ -490,7 +491,7 @@ int main() {
         //features
 
         //2d, 1 row
-        std::vector< std::vector<double> > featuresTemp = {titanicProjTemp[PCLASS]};
+        std::vector< std::vector<double> > featuresTemp = { titanicProjTemp[PCLASS] };
         std::vector< std::vector<double> > features = transpose(featuresTemp);
 
         //copy first 900 elements 
@@ -548,8 +549,8 @@ int main() {
 
        // vector< vector<double> >  train(vector< vector<double> > features, vector< vector<double> > labels, vector< vector<double> >  weights, int lr, int iters) {
 
-        vector< vector<double> > weights = { {0} };
-        vector< vector<double> > trainedWeights = trainModel(featuresTrain, labelsTrain, weights, 0.2, 10000);
+        vector< vector<double> > weights(0, vector<double>(0)); 
+        vector< vector<double> > trainedWeights = trainModel(featuresTrain, labelsTrain, weights, 0.2, 100);
 
         /**
          * features is an array of size nx1
@@ -559,7 +560,7 @@ int main() {
          * int retMe = inner_product(features.begin(), features.begin(), weights.begin(), 0);
          * retMe = sigmoid(retMe);
          **/
-        
+
         vector< vector<double> > preds = predict(featuresTest, trainedWeights);
         vector< vector<double> > testSurvivedTrans = transpose1dto2d(testSurvived);
         accuracy(testSurvivedTrans, preds);
