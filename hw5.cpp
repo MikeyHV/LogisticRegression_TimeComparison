@@ -18,13 +18,101 @@ vector<double> predict(vector< vector<double> > features,vector< vector<double> 
     return pls;
 }
 
-vector<double> updateWeights(vector< vector<double> > features,vector<double> labels,vector< vector<double> > weights,int lr){
-    int obs = labels.size();
+vector<double> transpose1d(vector<double> one){
+    //placeholder
+    vector<double> hi;
+    return hi;
+}
 
-    vector<double> preds = predict(features, weights);
+vector< vector<double> > transpose2d(vector< vector<double> > one){
+    vector< vector<double> > hi;
+    return hi;
+}
 
-    vector<double> class1Cost = labels * log(preds);
+vector<double>  transpose2dto1d(vector< vector<double> > one){
+    vector<double>  hi;
+    return hi;
+}
 
+vector< vector<double> > transpose1dto2d(vector<double> one){
+    vector< vector<double> >  hi;
+    return hi;
+}
+
+vector<double> matVecMult(vector<double> one, vector<double> two){
+    vector<double> ret(one.size());
+    vector<double> three = transpose1d(two);
+    for(int i = 0; i < one.size(); i++){
+        ret[i] = one[i] * three[i];
+    }
+    return ret;
+}
+
+vector< vector<double> > dotProduct(vector< vector<double> > one, vector<double> two){
+    /**
+     * takes in a nxm vector one
+     * and a mx1 vector two
+     * returns a nx1 vector ret
+    **/
+    //vector<vector<int>> vec( n , vector<int> (m, 0));
+    vector< vector<double> > ret(one.size());
+    for(int i = 0; i < one.size(); i++){
+        ret[i] = matVecMult(one[i], two);
+    }
+    return ret;
+}
+
+vector<double> vecDivScalar(vector<double> one, double scal){
+    for(int i = 0; i < one.size(); i++){
+        one[i] = one[i]/scal;
+    }
+    return one;
+}
+
+vector<double> vecMultScalar(vector<double> one, double scal){
+    for(int i = 0; i < one.size(); i++){
+        one[i] = one[i]*scal;
+    }
+    return one;
+}
+
+vector<double> vecSub(vector<double> one, vector<double> two){
+    for(int i = 0; i < one.size(); i++){
+        one[i] = one[i] - two[i];
+    }
+    return one;
+}
+
+
+/*
+* features: x values, 2d vector, everything except survived, nx3 array
+* labels: 0 or 1, output of classification, nx1 integers
+* weights: a parameter, double, 1x3 array
+* lr: learning rate, double
+*/
+std::vector< std::vector<double> > updateWeights(std::vector< std::vector<double> > features, 
+                                std::vector<double> labels, 
+                                std::vector< std::vector<double> > weights, 
+                                double lr) {
+    int n = features.size();
+
+    //make predictions
+    vector<double> predictions = predict(features, weights);
+    
+    vector<double> predMinLabel = costDiff(predictions, labels);
+
+    vector< vector<double> > featFeed = transpose2d(featFeed);
+
+    vector< vector<double> > gradient1 = dotProduct(featFeed, predMinLabel);
+    vector<double> gradient2 = transpose2dto1d(gradient1);
+    gradient2 = vecDivScalar(gradient2, n);
+    gradient2 = vecMultScalar(gradient2, lr);
+    //gradient3 = transpose1dto2d(gradient2);
+    vector<double> weightsTemp = transpose2dto1d(weights);
+    weightsTemp = vecSub(weightsTemp, gradient2);
+    weights = transpose1dto2d(weightsTemp);
+
+    return weights;
 }
 
 vector<double> classCost1(vector<double> preds, vector<double> labels){
