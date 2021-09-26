@@ -8,27 +8,43 @@
 
 
 const int MAX_LEN = 10000;
+const int NUM_COLS = 4;
 
 //holds all values
-std::vector<int> pclass(MAX_LEN);
-std::vector<int> survived(MAX_LEN);
-std::vector<int> sex(MAX_LEN);
+std::vector<double> pclass(MAX_LEN);
+std::vector<double> survived(MAX_LEN);
+std::vector<double> sex(MAX_LEN);
 std::vector<double> age(MAX_LEN);
 
+std::vector< std::vector<double> > titanicProj(NUM_COLS);
+
+
 //train subset
-std::vector<int> trainPclass(MAX_LEN);
-std::vector<int> trainSurvived(MAX_LEN);
-std::vector<int> trainSex(MAX_LEN);
+std::vector<double> trainPclass(MAX_LEN);
+std::vector<double> trainSurvived(MAX_LEN);
+std::vector<double> trainSex(MAX_LEN);
 std::vector<double> trainAge(MAX_LEN);
 
+std::vector< std::vector<double> > train(NUM_COLS);
+
+
 //test subset
-std::vector<int> testPclass(MAX_LEN);
-std::vector<int> testSurvived(MAX_LEN);
-std::vector<int> testSex(MAX_LEN);
+std::vector<double> testPclass(MAX_LEN);
+std::vector<double> testSurvived(MAX_LEN);
+std::vector<double> testSex(MAX_LEN);
 std::vector<double> testAge(MAX_LEN);
 
+std::vector< std::vector<double> > test(NUM_COLS);
+
+enum Col {
+    PCLASS = 0,
+    SURVIVED,
+    SEX,
+    AGE
+};
+
 /*
-* Need vectors: 
+* Need vectors:
 *     - train
 *     - test
 *     - pclass
@@ -85,6 +101,7 @@ bool readCsv(std::string fileName) {
 
     std::cout << "Closing file " << fileName << std::endl;
     inFS.close(); // Done with file, so close it
+
     return true;
 }
 
@@ -106,6 +123,58 @@ void splitData(int trainSize, std::vector<T>& original, std::vector<T>& train, s
     }
     test.resize(original.size() - trainSize); //resize arrray to num elements
 }
+void create2dVecs() {
+    //original
+    titanicProj[PCLASS] = pclass;
+    titanicProj[SURVIVED] = survived;
+    titanicProj[SEX] = sex;
+    titanicProj[AGE] = age;
+
+    //train (exclude SURVIEVED)
+    train[PCLASS] = trainPclass;
+    train[SEX] = trainSex;
+    train[AGE] = trainAge;
+    
+    //test (exclude SURVIEVED)
+    test[PCLASS] = testPclass;
+    test[SEX] = testSex;
+    test[AGE] = testAge;
+
+}
+
+/*
+* helper function, returns dot product of 2 vectors
+*/
+std::vector<double> vecSubtract(std::vector<double> vec1, std::vector<double> vec2) {
+    std::vector<double> ret = std::vector<double>();
+    for (int i = 0; i < vec1.size(); i++) {
+        ret[i] = vec1[i] - vec2[i];
+    }
+    return ret;
+}
+/*
+* features: x values, 2d vector, everything except survived, nx3 array
+* labels: 0 or 1, output of classification, nx1 integers
+* weights: a parameter, double, 1x3 array
+* lr: learning rate, double
+*/
+std::vector<double> updateWeights(std::vector< std::vector<double> >& features, 
+                                std::vector<double>& labels, 
+                                std::vector<double>& weights, 
+                                double lr) {
+    int n = features.size();
+
+    //make predictions
+    std::vector<double> predictions = predict(features, weights);
+    
+
+    double gradient = dotProduct(transpose(features[0]), vecSubtract(predictions, labels));
+    gradient = gradient / n;
+    gradient = gradient * lr;
+    weights = vecSubtract(weights, gradient);
+
+    return weights;
+}
 
 
 int main() {
@@ -115,6 +184,8 @@ int main() {
         splitData(900, survived, trainSurvived, testSurvived);
         splitData(900, sex, trainSex, testSex);
         splitData(900, age, trainAge, testAge);
+
+        create2dVecs();
 
         //perform log regression
 
