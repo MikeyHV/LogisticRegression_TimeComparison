@@ -4,14 +4,33 @@
 #include <cmath>
 #include <string>
 #include <math.h>
+#include <numeric>
 using namespace std;
 
+vector<double> predict(vector<double> features, vector<double> weights){
+    int retMe = inner_product(features.begin(), features.begin(), weights.begin(), 0);
+    retMe = sigmoid(retMe);
+    vector<double> pls;
+    return pls;
+}
+
 vector<double> updateWeights(vector<double> features,vector<int> labels,vector<double> weights,int lr){
+    int obs = labels.size();
+
+    vector<double> preds = predict(features, weights);
+
+    vector<double> class1Cost = labels * log(preds);
+
+}
+
+int classCost(vector<double> preds, vector<double> labels){
 
 }
 
 double costFunction(vector<double> features, vector<int>labels, vector<double>weights){
-
+    for(int i = 0; i < features.size(); i++){
+        features[]
+    }
 }
 
 double sigmoid(int z){
