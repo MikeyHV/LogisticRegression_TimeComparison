@@ -114,8 +114,9 @@ vector< vector<double> > sigmoid(vector< vector<double> > z) {
      * applies the sigmoid function to all indexes
      * returns a nx1
      * */
-    for (int i = 0; i < z[0].size(); i++) {
-        z[0][i] = 1.0 / (1 + exp(-z[0][i]));
+    //cout<< z.size() << endl;
+    for (int i = 0; i < z.size(); i++) {
+        z[i][0] = 1.0 / (1 + exp(z[i][0] * -1));
     }
     return z;
 }
@@ -131,7 +132,7 @@ std::vector<std::vector<double> > transpose1dto2d(vector<double> orig) {
 
     for (int i = 0; i < orig.size(); i++)
     {
-        transfVec[0].push_back(orig[i]);
+        transfVec[i].push_back(orig[i]);
     }
 
     return transfVec;
@@ -196,8 +197,8 @@ vector<double> matVecMult(vector<double> one, vector< vector<double> > two) {
 
 vector< vector<double> > dotProduct(vector< vector<double> > features, vector< vector<double> > weights) {
     /**
-     * takes in a nxm vector one
-     * and a mx1 vector two
+     * takes in a nxm vector features
+     * and a mx1 vector weights
      * returns a nx1 vector ret
     **/
     //vector<vector<int>> vec( n , vector<int> (m, 0));
@@ -274,7 +275,6 @@ std::vector< std::vector<double> > updateWeights(std::vector< std::vector<double
 
     weightsTemp = vecSub(weightsTemp, gradient2);
     weights = transpose1dto2d(weightsTemp);
-
     return weights;
 }
 
@@ -285,7 +285,7 @@ vector< vector<double> >  trainModel(vector< vector<double> > features, vector< 
         weights = updateWeights(features, labels, weights, lr);
         //double cost = costFunction(features, labels, weights);
         //hist.push_back(cost);
-        cout << "iteraion: " << i << endl;
+        //cout << "iteraion: " << i << endl;
     }
     return weights;
 }
@@ -389,11 +389,15 @@ void splitData(int trainSize, std::vector<T>& original, std::vector<T>& train, s
     train.resize(trainSize); //resize arrray to num elements
 
     //populate test
+    int j = 0;
     for (int i = trainSize; i < original.size(); i++) {
-        test[i] = original[i];
+
+        test[j] = original[i];
+        j++;
     }
     test.resize(original.size() - trainSize); //resize arrray to num elements
 }
+
 void create2dVecs() {
     //original
     titanicProjTemp[PCLASS] = pclass;
@@ -431,7 +435,7 @@ double accuracy(std::vector< std::vector<double> > test, std::vector< std::vecto
      **/
     double acc = 0;
     vector<double> corr;
-
+    
     for (int i = 0; i < test.size(); i++) {
         if (preds[i][0] < 0.5) {
             if (test[i][0] == 0) {
@@ -518,7 +522,7 @@ int main() {
             for (int j = 0; j < 1; j++) {
                 labelsTest[testIndex][j] = labels[i][j];
             }
-            testIndex++;
+            testIndex++; 
         }
 
         //perform log regression
@@ -527,20 +531,20 @@ int main() {
 
         vector< vector<double> > weights(1, vector<double>(1));
         weights[0][0] = 0.5;
-        vector< vector<double> > trainedWeights = trainModel(featuresTrain, labelsTrain, weights, 0.2, 100);
-
-        /**
-         * features is an array of size nx1
-         * weights is an array of size 1x1
-         * must return an array of size nx1
-         *
-         * int retMe = inner_product(features.begin(), features.begin(), weights.begin(), 0);
-         * retMe = sigmoid(retMe);
-         **/
+        vector< vector<double> > trainedWeights = trainModel(featuresTrain, labelsTrain, weights, 0.9999, 100);
+        cout << endl;
+        cout << trainedWeights[0][0] << " pls" << endl;
 
         vector< vector<double> > preds = predict(featuresTest, trainedWeights);
+
+        trainedWeights[0][0] = 0.999;
+        cout << trainedWeights[0][0] << " pls" << endl;
+
+        vector< vector<double> > preds2 = predict(featuresTest, trainedWeights);
         vector< vector<double> > testSurvivedTrans = transpose1dto2d(testSurvived);
-        accuracy(testSurvivedTrans, preds);
+        
+        cout<< accuracy(testSurvivedTrans, preds) << endl;
+        cout<< accuracy(testSurvivedTrans, preds2) << endl;
 
 
         std::cout << "haha" << std::endl;
