@@ -8,7 +8,7 @@
 
 
 const int MAX_LEN = 10000;
-const int NUM_ROWS = 4; //for temp matrix, we will later transpose it
+//const int NUM_ROWS = 4; //for temp matrix, we will later transpose it
 
 //holds all values
 std::vector<double> pclass(MAX_LEN);
@@ -16,9 +16,7 @@ std::vector<double> survived(MAX_LEN);
 std::vector<double> sex(MAX_LEN);
 std::vector<double> age(MAX_LEN);
 
-std::vector< std::vector<double> > titanicProjTemp(NUM_ROWS); //temp variable
-
-
+//std::vector< std::vector<double> > titanicProjTemp(NUM_ROWS); //temp variable
 
 //train subset
 std::vector<double> trainPclass(MAX_LEN);
@@ -26,7 +24,7 @@ std::vector<double> trainSurvived(MAX_LEN);
 std::vector<double> trainSex(MAX_LEN);
 std::vector<double> trainAge(MAX_LEN);
 
-std::vector< std::vector<double> > trainTemp(NUM_ROWS);
+//std::vector< std::vector<double> > trainTemp(NUM_ROWS);
 
 
 //test subset
@@ -35,13 +33,13 @@ std::vector<double> testSurvived(MAX_LEN);
 std::vector<double> testSex(MAX_LEN);
 std::vector<double> testAge(MAX_LEN);
 
-std::vector< std::vector<double> > testTemp(NUM_ROWS);
+//std::vector< std::vector<double> > testTemp(NUM_ROWS);
 
 using namespace std;
 //function prototypes: 
-std::vector<std::vector<double> > predict(vector< vector<double> > features, vector< vector<double> >  weights);
-std::vector<std::vector<double> > costDiff(std::vector<std::vector<double> > one, std::vector<std::vector<double> > two);
-double sumVec(std::vector<std::vector<double> > one);
+vector<double> predict(vector<double> features, vector<double> weights);
+vector<double> costDiff(vector<double> one, vector<double> two);
+double sumVec(vector<double> one);
 
 
 enum Col {
@@ -55,71 +53,71 @@ enum Col {
 using namespace std;
 
 
-vector< vector<double> >  classCost1(vector< vector<double> > preds, vector< vector<double> > labels) {
+vector<double> classCost1(vector<double> preds, vector<double> labels) {
     for (int i = 0; i < preds.size(); i++) {
-        preds[0][i] = log(preds[0][i]) * labels[0][i] * -1;
+        preds[i] = log(preds[i]) * labels[i] * -1;
     }
     return preds;
 }
 
-vector< vector<double> >  classCost2(vector< vector<double> > preds, vector< vector<double> > labels) {
+vector<double>  classCost2(vector<double> preds, vector<double> labels) {
     for (int i = 0; i < preds.size(); i++) {
-        preds[0][i] = log(1 - preds[0][i]) * (1 - labels[0][i]);
+        preds[i] = log(1 - preds[i]) * (1 - labels[i]);
     }
     return preds;
 }
 
-double costFunction(vector< vector<double> > features, vector< vector<double> > labels, vector< vector<double> > weights) {
-    std::vector<std::vector<double> >  preds = predict(features, weights);
+double costFunction(vector<double> features, vector<double> labels, vector<double> weights) {
+    vector<double> preds = predict(features, weights);
 
-    std::vector<std::vector<double> > cost1 = classCost1(preds, labels);
+    vector<double> cost1 = classCost1(preds, labels);
 
-    std::vector<std::vector<double> >  cost2 = classCost2(preds, labels);
+    vector<double> cost2 = classCost2(preds, labels);
 
-    std::vector<std::vector<double> > finCost = costDiff(cost1, cost2);
+    vector<double> finCost = costDiff(cost1, cost2);
 
     double cost = sumVec(finCost) / labels.size();
 
     return cost;
 }
 
-std::vector<std::vector<double> > costDiff(std::vector<std::vector<double> > one, std::vector<std::vector<double> > two) {
+vector<double> costDiff(vector<double> one, vector<double> two) {
     /**
      * one is predictions. a size of nx1
      * two is labels. a size of nx1
      * return a nx1
      * */
     for (int i = 0; i < one.size(); i++) {
-        one[i][0] = one[i][0] - two[i][0];
+        one[i] = one[i] - two[i];
     }
     return(one);
 }
 
-double sumVec(std::vector<std::vector<double> > one) {
+double sumVec(vector<double> one) {
     /*
     takes in an nx1
     returns a scalar
     */
     double sum = 0;
     for (int i = 0; i < one.size(); i++) {
-        one[0][i] = one[0][i] + sum;
+        one[i] = one[i] + sum;
     }
     return(sum);
 }
 
 
-vector< vector<double> > sigmoid(vector< vector<double> > z) {
+vector<double> sigmoid(vector<double> z) {
     /**
      * takes in a nx1 vector
      * applies the sigmoid function to all indexes
      * returns a nx1
      * */
-    for (int i = 0; i < z[0].size(); i++) {
-        z[0][i] = 1.0 / (1 + exp(-z[0][i]));
+    for (int i = 0; i < z.size(); i++) {
+        z[i] = 1.0 / (1 + exp(-z[i]));
     }
     return z;
 }
-
+/*
 std::vector<std::vector<double> > transpose1dto2d(vector<double> orig) {
     //placeholder
     std::vector<std::vector<double> > hi;
@@ -131,18 +129,20 @@ std::vector<std::vector<double> > transpose1dto2d(vector<double> orig) {
 
     for (int i = 0; i < orig.size(); i++)
     {
-        transfVec[0].push_back(orig[i]);
+        transfVec[i].push_back(orig[i]);
     }
 
     return transfVec;
 }
+*/
 
-
-vector<double>  transpose2dto1d(vector< vector<double> > orig) {
-    /**
-     * transpose a mx1 vector
-     * to a 1xm vecotr
-     **/
+/*
+vector<double> transpose2dto1d(vector< vector<double> > orig) {
+    
+     //transpose a mx1 vector
+     //to a 1xm vecotr
+     
+    
     std::vector<std::vector<double> > hi;
     if (orig.size() == 0) {
         return std::vector<double>(); //empty
@@ -157,10 +157,13 @@ vector<double>  transpose2dto1d(vector< vector<double> > orig) {
 
     return transfVec;
 }
+*/
+
 
 /*
 * returns the transpose of the vector passed in as an argument
 */
+/*
 std::vector<std::vector<double> > transpose2dto2d(std::vector<std::vector<double> > orig)
 {
     if (orig.size() == 0) {
@@ -179,37 +182,37 @@ std::vector<std::vector<double> > transpose2dto2d(std::vector<std::vector<double
 
     return transfVec;
 }
+*/
 
-vector<double> matVecMult(vector<double> one, vector< vector<double> > two) {
+vector<double> matVecMult(vector<double> one, vector<double> two) {
     /**
      * takes 1x1 a vector one
      * and a 1x1 vector two (transposes to 1xm)
      * and returns 1x1 vector
      **/
     vector<double> ret(one.size());
-    vector<double> three = transpose2dto1d(two);
+    //vector<double> three = two;
     for (int i = 0; i < one.size(); i++) {
-        ret[i] = one[i] * three[i];
+        ret[i] = one[i] * two[i];
     }
     return ret;
 }
 
-vector< vector<double> > dotProduct(vector< vector<double> > features, vector< vector<double> > weights) {
+vector<double> dotProduct(vector<double> features, vector<double> weights) {
     /**
      * takes in a nxm vector one
      * and a mx1 vector two
      * returns a nx1 vector ret
     **/
     //vector<vector<int>> vec( n , vector<int> (m, 0));
-    vector< vector<double> > ret(features.size(), std::vector<double>());
+    vector<double> ret(features.size());
     for (int i = 0; i < features.size(); i++) {
-        ret[i] = matVecMult(features[i], weights);
+        ret = matVecMult(features, weights);
     }
     return ret;
 }
 
-
-std::vector<std::vector<double> > predict(vector< vector<double> > features, vector< vector<double> >  weights) {
+vector<double> predict(vector<double> features, vector<double> weights) {
     /**
      * features is an array of size nx1
      * weights is an array of size 1x1
@@ -219,7 +222,7 @@ std::vector<std::vector<double> > predict(vector< vector<double> > features, vec
      * retMe = sigmoid(retMe);
      **/
 
-    vector< vector<double> > pls = dotProduct(features, weights);
+    vector<double> pls = dotProduct(features, weights);
     return sigmoid(pls);
 }
 
@@ -251,38 +254,37 @@ vector<double> vecSub(vector<double> one, vector<double> two) {
 * weights: a parameter, double, 1x3 array
 * lr: learning rate, double
 */
-std::vector< std::vector<double> > updateWeights(std::vector< std::vector<double> > features,
-    vector< vector<double> > labels,
-    std::vector< std::vector<double> > weights,
+std::vector<double> updateWeights(std::vector<double> features,
+    vector<double> labels,
+    std::vector<double> weights,
     double lr) {
     int n = features.size();
 
     //make predictions
-    vector< vector<double> > predictions = predict(features, weights);
+    vector<double> predictions = predict(features, weights);
 
-    std::vector<std::vector<double> > predMinLabel = costDiff(predictions, labels);
+    vector<double> predMinLabel = costDiff(predictions, labels);
 
-    vector< vector<double> > featFeed = transpose2dto2d(features);
+    //vector< vector<double> > featFeed = transpose2dto2d(features);
 
-    vector< vector<double> > gradient1 = dotProduct(featFeed, predMinLabel);
+    vector<double> gradient1 = dotProduct(features, predMinLabel);
 
-    vector<double> gradient2 = transpose2dto1d(gradient1);
-    vector<double> weightsTemp = transpose2dto1d(weights);
+    //vector<double> gradient2 = transpose2dto1d(gradient1);
+    //vector<double> weightsTemp = transpose2dto1d(weights);
 
-    gradient2 = vecDivScalar(gradient2, n);
-    gradient2 = vecMultScalar(gradient2, lr);
+    gradient1 = vecDivScalar(gradient1, n);
+    gradient1 = vecMultScalar(gradient1, lr);
 
-    weightsTemp = vecSub(weightsTemp, gradient2);
-    weights = transpose1dto2d(weightsTemp);
+    weights = vecSub(weights, gradient1);
 
     return weights;
 }
 
-vector< vector<double> >  trainModel(vector< vector<double> > features, vector< vector<double> > labels, vector< vector<double> >  weights, double lr, int iters) {
+vector<double> trainModel(vector<double> feature, vector<double> label, vector<double> weights, double lr, int iters) {
     //vector<double> hist;
 
     for (int i = 0; i < iters; i++) {
-        weights = updateWeights(features, labels, weights, lr);
+        weights = updateWeights(feature, label, weights, lr);
         //double cost = costFunction(features, labels, weights);
         //hist.push_back(cost);
         cout << "iteraion: " << i << endl;
@@ -316,12 +318,10 @@ std::vector<std::vector<double> > transpose(std::vector<std::vector<double> > or
 
 /*
 * Need vectors:
-*     - train
-*     - test
-*     - pclass
-*     - survived
-*     - sex
-*     - age
+* - train$survived
+* - test$survived
+* - train$pclass
+* - test$pclass
 */
 bool readCsv(std::string fileName) {
     std::ifstream inFS; // Input file stream
@@ -389,11 +389,14 @@ void splitData(int trainSize, std::vector<T>& original, std::vector<T>& train, s
     train.resize(trainSize); //resize arrray to num elements
 
     //populate test
+    int j = 0;
     for (int i = trainSize; i < original.size(); i++) {
-        test[i] = original[i];
+        test[j] = original[i];
+        j++;
     }
     test.resize(original.size() - trainSize); //resize arrray to num elements
 }
+/*
 void create2dVecs() {
     //original
     titanicProjTemp[PCLASS] = pclass;
@@ -412,6 +415,7 @@ void create2dVecs() {
     testTemp[AGE] = testAge;
 
 }
+*/
 
 
 
@@ -425,7 +429,7 @@ std::vector<double> vecSubtract(std::vector<double> vec1, std::vector<double> ve
     return ret;
 }
 
-double accuracy(std::vector< std::vector<double> > test, std::vector< std::vector<double> > preds) {
+double accuracy(vector<double> test, vector<double> preds) {
     /**
      * two nx1 vectors
      **/
@@ -433,21 +437,19 @@ double accuracy(std::vector< std::vector<double> > test, std::vector< std::vecto
     vector<double> corr;
 
     for (int i = 0; i < test.size(); i++) {
-        if (preds[i][0] < 0.5) {
-            if (test[i][0] == 0) {
+        if (preds[i] < 0.5) {
+            if (test[i] == 0) {
                 acc++;
             }
         }
         else {
-            if (test[i][0] == 1) {
+            if (test[i] == 1) {
                 acc++;
             }
         }
     }
     return acc / test.size();
 }
-
-
 
 
 int main() {
@@ -457,26 +459,28 @@ int main() {
         splitData(900, survived, trainSurvived, testSurvived);
         splitData(900, sex, trainSex, testSex);
         splitData(900, age, trainAge, testAge);
+        
+        //create2dVecs();
 
-        create2dVecs();
-
-        std::vector< std::vector<double> > titanicProj = transpose(titanicProjTemp);
-        std::vector< std::vector<double> > train = transpose(trainTemp);
-        std::vector< std::vector<double> > test = transpose(testTemp);
+        //std::vector< std::vector<double> > titanicProj = transpose(titanicProjTemp);
+        //std::vector< std::vector<double> > train = transpose(trainTemp);
+        //std::vector< std::vector<double> > test = transpose(testTemp);
 
         //features
 
         //2d, 1 row
-        std::vector< std::vector<double> > featuresTemp(1, titanicProjTemp[PCLASS]); 
-        std::vector< std::vector<double> > features = transpose(featuresTemp);
+        // std::vector< std::vector<double> > featuresTemp(1, titanicProjTemp[PCLASS]); 
+        //std::vector< std::vector<double> > features = transpose(featuresTemp);
 
         //copy first 900 elements 
+        /*
         std::vector< std::vector<double> > featuresTrain(900, std::vector<double>(1));
         for (int i = 0; i < 900; i++) {
             for (int j = 0; j < 1; j++) {
                 featuresTrain[i][j] = features[i][j];
             }
         }
+
 
         //copy remaining elements
         std::vector< std::vector<double> > featuresTest(0, std::vector<double>(0));
@@ -488,6 +492,7 @@ int main() {
             }
             testIndex++;
         }
+        
 
         //-----------------------------------------------------------------------------------
         //labels
@@ -520,14 +525,27 @@ int main() {
             }
             testIndex++;
         }
+        
+
+        //WTFFFF
+        vector<double>  transpose2dto1d(vector< vector<double> > orig);
+        vector<double> transposed2dto1d = transpose2dto1d(
+            {
+                {1},
+                {3},
+                {5}
+            }
+        );
+        cout << "hi" << endl;
+        */
 
         //perform log regression
 
        // vector< vector<double> >  train(vector< vector<double> > features, vector< vector<double> > labels, vector< vector<double> >  weights, int lr, int iters) {
 
-        vector< vector<double> > weights(1, vector<double>(1));
-        weights[0][0] = 0.5;
-        vector< vector<double> > trainedWeights = trainModel(featuresTrain, labelsTrain, weights, 0.2, 100);
+        vector<double> weights(trainPclass.size());
+        fill(weights.begin(), weights.end(), 0.5);
+        vector<double> trainedWeights = trainModel(trainPclass, trainSurvived, weights, 0.5, 5000);
 
         /**
          * features is an array of size nx1
@@ -537,10 +555,10 @@ int main() {
          * int retMe = inner_product(features.begin(), features.begin(), weights.begin(), 0);
          * retMe = sigmoid(retMe);
          **/
-
-        vector< vector<double> > preds = predict(featuresTest, trainedWeights);
-        vector< vector<double> > testSurvivedTrans = transpose1dto2d(testSurvived);
-        accuracy(testSurvivedTrans, preds);
+        
+        vector<double> preds = predict(testPclass, trainedWeights);
+        //vector<double> testSurvivedTrans = transpose1dto2d(testSurvived);
+        cout << "accuracy: " << accuracy(testSurvived, preds) * 100 << "%" << endl;
 
 
         std::cout << "haha" << std::endl;
