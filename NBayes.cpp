@@ -33,92 +33,6 @@ using namespace std;
 
 using namespace std;
 
-//returns summation of parameter inputVector 
-double vectorSum(const std::vector<double>& inputVector) {
-    double sum = 0;
-    for (double curr : inputVector) {
-        sum += curr;
-    }
-    return sum;
-}
-
-//returns mean of parameter inputVector 
-double vectorMean(const std::vector<double>& inputVector) {
-    double mean = 0;
-    double sum = vectorSum(inputVector);
-    mean = sum / inputVector.size();
-    return mean;
-}
-
-//returns variance of vector parameter inputVector
-double vectorVariance(const std::vector<double>& inputVector) {
-    double summation = 0;
-    double xAvg = 0;
-    double xSum = 0;
-    int n = inputVector.size();
-    double variance = 0;
-
-    //calculate avg
-    for (int i = 0; i < n; i++) {
-        xSum += inputVector[i];
-    }
-    xAvg = xSum / n;
-
-    //calculate variance
-    for (int i = 0; i < n; i++) {
-        summation += ((inputVector[i] - xAvg) * (inputVector[i] - xAvg)); //(xi - xAvg)
-    }
-    variance = summation / (n - 1);
-    return variance;
-}
-
-//computes likelihood of continuous vector
-vector<double> likelihoodContinuous1d(vector<double> x) {
-    double mean = vectorMean(x);
-    double variance = vectorVariance(x);
-    double myPi = atan(1) * 4; //pi
-
-    vector<double> likelihoods(0);
-    double expNumerator;
-    double expDenominator;
-    double temp; 
-    for (double instance : x) {
-        expNumerator = -1 * pow((instance - mean), 2);
-        expDenominator = 2 * variance;
-        temp = 1 / sqrt(2 * myPi * variance) * exp(expNumerator / expDenominator);
-        likelihoods.push_back(temp);
-    }
-    cout << "age mean " << mean << endl;
-    cout << "age variance " << variance << endl;
-    return likelihoods;
-}
-
-vector< vector<double> > likelihoodContinuous(vector<double> age, vector<double> survived) {
-    vector<double> survivedAges(0);
-    vector<double> notSurvivedAges(0);
-
-    //populate survived and notSurvived vectors
-    for (int i = 0; i < survived.size(); i ++) {
-        if (survived[i] == 1) { //if person survived, add their age to survivedAges
-            survivedAges.push_back(age[i]);
-        }
-        else {
-            notSurvivedAges.push_back(age[i]);
-        }
-    }
-
-    //calculate likelihoods
-    vector<double> likelihoodAgeSurvived = likelihoodContinuous1d(survivedAges);
-    vector<double> likelihoodAgeNotSurvived = likelihoodContinuous1d(notSurvivedAges);
-
-    vector< vector<double> > ret(0);
-    ret.push_back(likelihoodAgeSurvived);
-    ret.push_back(likelihoodAgeNotSurvived);
-
-    return ret; //ret[0] = likelihoodAgeSurvived, ret[1] = likelihoodAgeNotSurvived
-
-}
-
 double sumVec(vector<double> one) {
     /*
     takes in an nx1
@@ -376,12 +290,114 @@ vector< vector<double> > posteriorDiscretePClass(vector<double> pclass, vector<d
     return fin;
 }
 
-vector <double> naiveBayes(vector<double> pclass, vector<double> sex, vector<double> age, vector<double> survived){
-    vector< vector<double> > postSex = posteriorDiscreteSex(sex, survived);
-    
-    vector< vector<double> > postClass = posteriorDiscretePClass(pclass, survived);
+//returns summation of parameter inputVector 
+double vectorSum(const std::vector<double>& inputVector) {
+    double sum = 0;
+    for (double curr : inputVector) {
+        sum += curr;
+    }
+    return sum;
+}
 
-    
+//returns mean of parameter inputVector 
+double vectorMean(const std::vector<double>& inputVector) {
+    double mean = 0;
+    double sum = vectorSum(inputVector);
+    mean = sum / inputVector.size();
+    return mean;
+}
+
+//returns variance of vector parameter inputVector
+double vectorVariance(const std::vector<double>& inputVector) {
+    double summation = 0;
+    double xAvg = 0;
+    double xSum = 0;
+    int n = inputVector.size();
+    double variance = 0;
+
+    //calculate avg
+    for (int i = 0; i < n; i++) {
+        xSum += inputVector[i];
+    }
+    xAvg = xSum / n;
+
+    //calculate variance
+    for (int i = 0; i < n; i++) {
+        summation += ((inputVector[i] - xAvg) * (inputVector[i] - xAvg)); //(xi - xAvg)
+    }
+    variance = summation / (n - 1);
+    return variance;
+}
+
+//computes likelihood of continuous vector
+vector<double> likelihoodContinuous1d(vector<double> x) {
+    double mean = vectorMean(x);
+    double variance = vectorVariance(x);
+    double myPi = atan(1) * 4; //pi
+
+    vector<double> likelihoods(0);
+    double expNumerator;
+    double expDenominator;
+    double temp; 
+    for (double instance : x) {
+        expNumerator = -1 * pow((instance - mean), 2);
+        expDenominator = 2 * variance;
+        temp = 1 / sqrt(2 * myPi * variance) * exp(expNumerator / expDenominator);
+        likelihoods.push_back(temp);
+    }
+    cout << "age mean " << mean << endl;
+    cout << "age variance " << variance << endl;
+    return likelihoods;
+}
+
+vector< vector<double> > likelihoodContinuous(vector<double> age, vector<double> survived) {
+    vector<double> survivedAges(0);
+    vector<double> notSurvivedAges(0);
+
+    //populate survived and notSurvived vectors
+    for (int i = 0; i < survived.size(); i ++) {
+        if (survived[i] == 1) { //if person survived, add their age to survivedAges
+            survivedAges.push_back(age[i]);
+        }
+        else {
+            notSurvivedAges.push_back(age[i]);
+        }
+    }
+
+    //calculate likelihoods
+    vector<double> likelihoodAgeSurvived = likelihoodContinuous1d(survivedAges);
+    vector<double> likelihoodAgeNotSurvived = likelihoodContinuous1d(notSurvivedAges);
+
+    vector< vector<double> > ret(0);
+    ret.push_back(likelihoodAgeSurvived);
+    ret.push_back(likelihoodAgeNotSurvived);
+
+    return ret; //ret[0] = likelihoodAgeSurvived, ret[1] = likelihoodAgeNotSurvived
+
+}
+
+vector <double> naiveBayes(double pclass, double sex, double age, 
+                            vector< double > survived,
+                            vector< vector<double> > weightsPclass, 
+                            vector< vector<double> > weightsSex, 
+                            vector< vector<double> > weightsAge){
+    double pclassS = weightsPclass[1, pclass];
+    double sexS = weightsSex[1, sex];
+    double ageS = weightsAge[1, age];
+
+    double pclassD = weightsPclass[0, pclass];
+    double sexD = weightsSex[0, sex];
+    double ageD = weightsAge[0, age];
+
+    double pS = surivved[1];
+    double pD = survived[0];
+
+    double featureProbsS = pclassS * sexS * ageS * pS;
+    double featureProbsD = pclassD * sexD * ageD * pD;
+
+    double denom = featureProbsS + featureProbsD;
+
+    return { featureProbsS/denom, featureProbsD/denom }
 }
 
 /**
@@ -415,5 +431,18 @@ int main() {
     splitData(900, sex, trainSex, testSex);
     splitData(900, age, trainAge, testAge);
 
+    vector< vector<double> > weightsPclass = posteriorDiscretePClass(trainPclass, trainSurvived);
+    vector< vector<double> > weightsSex = posteriorDiscreteSex(trainSex, trainSurvived);
+    //vector< vector<double> > weightsAge = posteriorContinusou
+    vector< vector<double> > weightsAge;
 
+    vector< vector<double> > testProbs;
+    // this is a nx2 vector. each row is an instance, column 1 is dead, 2 is survived.
+
+    for(int i = 0; i < testSex.size(); i++){
+        sexi = testSex[i];
+        agei = testAge[i];
+        pclassi = testPclass[i];
+        testProbs.append(naiveBayes(pclass, sex, age, weightsPclass, weightsSex, weightsAge));
+    }
 };
