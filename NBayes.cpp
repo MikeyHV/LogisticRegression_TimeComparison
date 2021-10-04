@@ -286,6 +286,122 @@ double accuracy(vector<double> test, vector<double> preds) {
     return acc / test.size();
 }
 
+vector< vector<double> > posteriorDiscreteSex(vector<double> sex, vector<double> survived){
+    double ms = 0;
+    double fs = 0;
+    double md = 0;
+    double fd = 0;
+    double diedNum = 0;
+    double surviveNum = 0;
+    for(int i = 0; i < survived.size(); i++){
+        if(pclass[i] == 0){
+            if(survived[i] == 1){
+                ms++;
+                surviveNum++;
+            }else{
+                md++;
+                diedNum++;
+            }
+        }
+        if(pclass[i] == 1){
+            if(survived[i] == 1){
+                fs++;
+                surviveNum++;
+            }else{
+                fd++;
+                diedNum++;
+            }
+        }
+    }
+    double probmS = ms/surviveNum;
+    double probfS = fs/surviveNum;
+    double probmD = md/diedNum;
+    double probfD = fd/diedNum;
+    vector< vector<double> > fin { { probmS, probfS }
+                                    { probmD, probfD } };
+    return fin;
+}
+
+vector< vector<double> > posteriorDiscretePClass(vector<double> pclass, vector<double> survived){
+    /**
+     * 
+     * lh_pclass[survived+1, passClass] = sum(pclass && survived)/sum(survived)
+     * 
+     */
+    double ones = 0;
+    double twos = 0;
+    double threes = 0;
+    double oned = 0;
+    double twod = 0;
+    double threed = 0;
+    double diedNum = 0;
+    double surviveNum = 0;
+    for(int i = 0; i < survived.size(); i++){
+        if(pclass[i] == 1){
+            if(survived[i] == 1){
+                ones++;
+                surviveNum++;
+            }else{
+                oned++;
+                diedNum++;
+            }
+        }
+        if(pclass[i] == 2){
+            if(survived[i] == 1){
+                twos++;
+                surviveNum++;
+            }else{
+                twod++;
+                diedNum++;
+            }
+        }
+        if(pclass[i] == 3){
+            if(survived[i] == 1){
+                threes++;
+                surviveNum++;
+            }else{
+                threed++;
+                diedNum++;
+            }
+        }
+    }
+    double prob1S = ones/surviveNum;
+    double prob2S = twos/surviveNum;
+    double prob3S = threes/surviveNum;
+    double prob1D = oned/diedNum;
+    double prob2D = twod/diedNum;
+    double prob3D = threed/diedNum;
+    vector< vector<double> > fin { { prob1S, prob2S, prob3S }
+                                    { prob1D, prob2D, prob3D } };
+    return fin;
+}
+
+vector <double> naiveBayes(vector<double> pclass, vector<double> sex, vector<double> age, vector<double> survived){
+    vector< vector<double> > postSex = posteriorDiscreteSex(sex, survived);
+    
+    vector< vector<double> > postClass = posteriorDiscretePClass(pclass, survived);
+
+    
+}
+
+/**
+ * 
+ * putting it all together:
+ * 
+ * nums = psurvivedPclass * psurvivedsex * psurvived(apriori) * p_agecalculation
+ * numd = pdiedPclass * pdiedsec * pdied(apriori) * p_agecalculation
+ * i dont fully understand above yet. what do i do about the 3 different classes and 2 different sexes?
+ * 
+ * denom = psurvivedPclass * psurvivedsex * psurvivedage * apriorisurvived +
+ *         all of the above but died haha
+ * 
+ * return list(probablySurvived = nums/denom, probablityDeadDead = numd/denom)
+ */
+
+/**
+ * 
+ * calculate apriori later
+ */
 
 int main() {
     bool readSuccess = readCsv("titanic_project.csv");
@@ -298,8 +414,6 @@ int main() {
     splitData(900, survived, trainSurvived, testSurvived);
     splitData(900, sex, trainSex, testSex);
     splitData(900, age, trainAge, testAge);
-
-    vector< vector<double> > continuous = likelihoodContinuous(trainAge, trainSurvived);
 
 
 };
