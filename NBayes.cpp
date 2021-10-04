@@ -291,6 +291,28 @@ vector< vector<double> > posteriorDiscretePClass(vector<double> pclass, vector<d
     return fin;
 }
 
+vector <double> naiveBayes(vector<double> pclass, vector<double> sex, vector<double> age, vector<double> survived){
+    vector< vector<double> > postSex = posteriorDiscreteSex(sex, survived);
+    
+    vector< vector<double> > postClass = posteriorDiscretePClass(pclass, survived);
+
+    
+}
+
+/**
+ * 
+ * putting it all together:
+ * 
+ * nums = psurvivedPclass * psurvivedsex * psurvived(apriori) * p_agecalculation
+ * numd = pdiedPclass * pdiedsec * pdied(apriori) * p_agecalculation
+ * i dont fully understand above yet. what do i do about the 3 different classes and 2 different sexes?
+ * 
+ * denom = psurvivedPclass * psurvivedsex * psurvivedage * apriorisurvived +
+ *         all of the above but died haha
+ * 
+ * return list(probablySurvived = nums/denom, probablityDeadDead = numd/denom)
+ */
+
 /**
  * 
  * calculate apriori later
@@ -307,4 +329,5 @@ int main() {
     splitData(900, survived, trainSurvived, testSurvived);
     splitData(900, sex, trainSex, testSex);
     splitData(900, age, trainAge, testAge);
+
 };
