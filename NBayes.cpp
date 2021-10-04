@@ -201,6 +201,64 @@ double accuracy(vector<double> test, vector<double> preds) {
     return acc / test.size();
 }
 
+vector< vector<double> > posteriorDiscretePClass(vector<double> pclass, vector<double> survived){
+    /**
+     * 
+     * lh_pclass[survived+1, passClass] = sum(pclass && survived)/sum(survived)
+     * 
+     */
+    double ones = 0;
+    double twos = 0;
+    double threes = 0;
+    double oned = 0;
+    double twod = 0;
+    double threed = 0;
+    double diedNum = 0;
+    double surviveNum = 0;
+    for(int i = 0; i < survived.size(); i++){
+        if(pclass[i] == 1){
+            if(survived[i] == 1){
+                ones++;
+                surviveNum++;
+            }else{
+                oned++;
+                diedNum++;
+            }
+        }
+        if(pclass[i] == 2){
+            if(survived[i] == 1){
+                twos++;
+                surviveNum++;
+            }else{
+                twod++;
+                diedNum++;
+            }
+        }
+        if(pclass[i] == 3){
+            if(survived[i] == 1){
+                threes++;
+                surviveNum++;
+            }else{
+                threed++;
+                diedNum++;
+            }
+        }
+    }
+    double prob1S = ones/surviveNum;
+    double prob2S = twos/surviveNum;
+    double prob3S = threes/surviveNum;
+    double prob1D = oned/diedNum;
+    double prob2D = twod/diedNum;
+    double prob3D = threed/diedNum;
+    vector< vector<double> > fin { { prob1S, prob2S, prob3S }
+                                    { prob1D, prob2D, prob3D } };
+    return fin;
+}
+
+/**
+ * 
+ * calculate apriori later
+ */
 
 int main() {
     bool readSuccess = readCsv("titanic_project.csv");
