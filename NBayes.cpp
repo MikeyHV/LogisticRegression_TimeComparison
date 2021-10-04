@@ -201,6 +201,42 @@ double accuracy(vector<double> test, vector<double> preds) {
     return acc / test.size();
 }
 
+vector< vector<double> > posteriorDiscreteSex(vector<double> sex, vector<double> survived){
+    double ms = 0;
+    double fs = 0;
+    double md = 0;
+    double fd = 0;
+    double diedNum = 0;
+    double surviveNum = 0;
+    for(int i = 0; i < survived.size(); i++){
+        if(pclass[i] == 0){
+            if(survived[i] == 1){
+                ms++;
+                surviveNum++;
+            }else{
+                md++;
+                diedNum++;
+            }
+        }
+        if(pclass[i] == 1){
+            if(survived[i] == 1){
+                fs++;
+                surviveNum++;
+            }else{
+                fd++;
+                diedNum++;
+            }
+        }
+    }
+    double probmS = ms/surviveNum;
+    double probfS = fs/surviveNum;
+    double probmD = md/diedNum;
+    double probfD = fd/diedNum;
+    vector< vector<double> > fin { { probmS, probfS }
+                                    { probmD, probfD } };
+    return fin;
+}
+
 vector< vector<double> > posteriorDiscretePClass(vector<double> pclass, vector<double> survived){
     /**
      * 
