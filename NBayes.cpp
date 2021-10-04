@@ -203,17 +203,14 @@ double accuracy(vector<double> test, vector<double> preds) {
 
 
 int main() {
-    if (readCsv("titanic_project.csv")) {
-        //split data into train and test
-        splitData(900, pclass, trainPclass, testPclass);
-        splitData(900, survived, trainSurvived, testSurvived);
-        splitData(900, sex, trainSex, testSex);
-        splitData(900, age, trainAge, testAge);
-
-
-    }
-    else {
+    bool readSuccess = readCsv("titanic_project.csv");
+    if (!readSuccess) {
         std::cout << "something went wrong in readCsv()" << std::endl;
         return 1;
     }
+    //split data into train and test
+    splitData(900, pclass, trainPclass, testPclass);
+    splitData(900, survived, trainSurvived, testSurvived);
+    splitData(900, sex, trainSex, testSex);
+    splitData(900, age, trainAge, testAge);
 };
