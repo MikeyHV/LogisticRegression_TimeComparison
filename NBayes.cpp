@@ -365,15 +365,20 @@ vector< vector<double> > likelihoodContinuous(vector<double> age, vector<double>
     }
 
     //calculate likelihoods
-    vector<double> likelihoodAgeSurvived = likelihoodContinuous1d(survivedAges);
-    vector<double> likelihoodAgeNotSurvived = likelihoodContinuous1d(notSurvivedAges);
+    vector<double> agesMean = { vectorMean(notSurvivedAges), vectorMean(survivedAges) }
+    vector<double> agesVar = { vectorVariance(notSurvivedAges), vectorVariance(survivedAges) }
 
     vector< vector<double> > ret(0);
-    ret.push_back(likelihoodAgeSurvived);
-    ret.push_back(likelihoodAgeNotSurvived);
+    ret.push_back(agesMean);
+    ret.push_back(agesVar);
 
     return ret; //ret[0] = likelihoodAgeSurvived, ret[1] = likelihoodAgeNotSurvived
+}
 
+double calcPAge(double age, double mean, double var){
+    expNumerator = -1 * pow((instance - mean), 2);
+    expDenominator = 2 * variance;
+    return 1 / sqrt(2 * myPi * variance) * exp(expNumerator / expDenominator);
 }
 
 vector <double> naiveBayes(double pclass, double sex, double age, 
@@ -381,13 +386,17 @@ vector <double> naiveBayes(double pclass, double sex, double age,
                             vector< vector<double> > weightsPclass, 
                             vector< vector<double> > weightsSex, 
                             vector< vector<double> > weightsAge){
+
+    vector<double> agesMean = weightsAge[0];
+    vector<double> agesVar = weightsAge[1];
+
     double pclassS = weightsPclass[1, pclass];
     double sexS = weightsSex[1, sex];
-    double ageS = weightsAge[1, age];
+    double ageS = calcPAge(age, agesMean[1], agesVar[1]);
 
     double pclassD = weightsPclass[0, pclass];
     double sexD = weightsSex[0, sex];
-    double ageD = weightsAge[0, age];
+    double ageD = calcPAge(age, agesMean[0], agesVar[0]);
 
     double pS = surivved[1];
     double pD = survived[0];
@@ -433,8 +442,7 @@ int main() {
 
     vector< vector<double> > weightsPclass = posteriorDiscretePClass(trainPclass, trainSurvived);
     vector< vector<double> > weightsSex = posteriorDiscreteSex(trainSex, trainSurvived);
-    //vector< vector<double> > weightsAge = posteriorContinusou
-    vector< vector<double> > weightsAge;
+    vector< vector<double> > weightsAge = likelihoodContinuous(trainAge, trainSurvived);
 
     vector< vector<double> > testProbs;
     // this is a nx2 vector. each row is an instance, column 1 is dead, 2 is survived.
@@ -443,6 +451,7 @@ int main() {
         sexi = testSex[i];
         agei = testAge[i];
         pclassi = testPclass[i];
-        testProbs.append(naiveBayes(pclass, sex, age, weightsPclass, weightsSex, weightsAge));
+        survivedi = testSurvived[i];
+        testProbs.append(naiveBayes(pclassi, sexi, agei, survivedi, weightsPclass, weightsSex, weightsAge));
     }
 };
