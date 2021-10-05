@@ -375,6 +375,20 @@ vector< vector<double> > likelihoodContinuous(vector<double> age, vector<double>
     return ret; //ret[0] = likelihoodAgeSurvived, ret[1] = likelihoodAgeNotSurvived
 }
 
+int apriori(vector<double> data){
+    double survived = 0;
+    double notsurvived = 0;
+    for(int i = 0; i < data.size(); i++){
+        if(data[0] == 0){
+            survived++;
+        }else{
+            notsurvived++;
+        }
+    }
+    vector<double> apriori = { notsurvived/data.size(), survived/data.size() }
+    return apriori;
+}
+
 double calcPAge(double age, double mean, double var){
     double expNumerator = -1 * pow((age - mean), 2);
     double expDenominator = 2 * var;
