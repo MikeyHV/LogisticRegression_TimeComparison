@@ -240,8 +240,8 @@ vector< vector<double> > posteriorDiscreteSex(vector<double> sex, vector<double>
     double probfS = fs/surviveNum;
     double probmD = md/diedNum;
     double probfD = fd/diedNum;
-    vector< vector<double> > fin { { probmS, probfS },
-                                    { probmD, probfD } };
+    vector< vector<double> > fin { { probmD, probfD },
+                                    { probmS, probfS } };
     return fin;
 }
 
@@ -294,8 +294,8 @@ vector< vector<double> > posteriorDiscretePClass(vector<double> pclass, vector<d
     double prob1D = oned/diedNum;
     double prob2D = twod/diedNum;
     double prob3D = threed/diedNum;
-    vector< vector<double> > fin { { prob1S, prob2S, prob3S },
-                                    { prob1D, prob2D, prob3D } };
+    vector< vector<double> > fin { { prob1D, prob2D, prob3D },
+                                    { prob1S, prob2S, prob3S } };
     return fin;
 }
 
@@ -422,7 +422,7 @@ vector <double> naiveBayes(double pclass, double sex, double age,
     double ageS = calcPAge(age, agesMean[1], agesVar[1]);
 
     double pclassD = weightsPclass[0][intPclass-1];
-    double sexD = weightsSex[0] [intSex];
+    double sexD = weightsSex[0][intSex];
     double ageD = calcPAge(age, agesMean[0], agesVar[0]);
 
     double pS = survived[1];
