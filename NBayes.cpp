@@ -375,7 +375,7 @@ vector< vector<double> > likelihoodContinuous(vector<double> age, vector<double>
     return ret; //ret[0] = likelihoodAgeSurvived, ret[1] = likelihoodAgeNotSurvived
 }
 
-int apriori(vector<double> data){
+vector<double> apriori(vector<double> data){
     double survived = 0;
     double notsurvived = 0;
     for(int i = 0; i < data.size(); i++){
@@ -385,7 +385,7 @@ int apriori(vector<double> data){
             notsurvived++;
         }
     }
-    vector<double> apriori = { notsurvived/data.size(), survived/data.size() }
+    vector<double> apriori = { notsurvived / data.size(), survived / data.size() };
     return apriori;
 }
 
@@ -405,12 +405,15 @@ vector <double> naiveBayes(double pclass, double sex, double age,
     vector<double> agesMean = weightsAge[0];
     vector<double> agesVar = weightsAge[1];
 
-    double pclassS = weightsPclass[1][pclass];
-    double sexS = weightsSex[1][sex];
+    int intPclass = pclass;
+    int intSex = sex;
+
+    double pclassS = weightsPclass[1][intPclass-1];
+    double sexS = weightsSex[1][intSex];
     double ageS = calcPAge(age, agesMean[1], agesVar[1]);
 
-    double pclassD = weightsPclass[0][pclass];
-    double sexD = weightsSex[0] [sex];
+    double pclassD = weightsPclass[0][intPclass-1];
+    double sexD = weightsSex[0] [intSex];
     double ageD = calcPAge(age, agesMean[0], agesVar[0]);
 
     double pS = survived[1];
@@ -421,7 +424,7 @@ vector <double> naiveBayes(double pclass, double sex, double age,
 
     double denom = featureProbsS + featureProbsD;
 
-    return { featureProbsS/denom, featureProbsD/denom }
+    return { featureProbsS / denom, featureProbsD / denom };
 }
 
 /**
@@ -458,7 +461,7 @@ int main() {
     vector< vector<double> > weightsPclass = posteriorDiscretePClass(trainPclass, trainSurvived);
     vector< vector<double> > weightsSex = posteriorDiscreteSex(trainSex, trainSurvived);
     vector< vector<double> > weightsAge = likelihoodContinuous(trainAge, trainSurvived);
-    vector< double > aprioriS = apriroi(trainSurvived);
+    vector< double > aprioriS = apriori(trainSurvived);
 
     vector< vector<double> > testProbs;
     // this is a nx2 vector. each row is an instance, column 1 is dead, 2 is survived.
@@ -468,5 +471,9 @@ int main() {
         double agei = testAge[i];
         double pclassi = testPclass[i];
         testProbs.push_back(naiveBayes(pclassi, sexi, agei, aprioriS, weightsPclass, weightsSex, weightsAge));
+    }
+    for (int i = 0; i < testSex.size(); i++) {
+        cout << testProbs[i] << endl;
+
     }
 };
