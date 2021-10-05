@@ -33,59 +33,6 @@ using namespace std;
 
 using namespace std;
 
-double sumVec(vector<double> one) {
-    /*
-    takes in an nx1
-    returns a scalar
-    */
-    double sum = 0;
-    for (int i = 0; i < one.size(); i++) {
-        one[i] = one[i] + sum;
-    }
-    return(sum);
-}
-
-vector<double> dotProduct(vector<double> features, vector<double> weights) {
-    /**
-     * takes in a nxm vector one
-     * and a mx1 vector two
-     * returns a nx1 vector ret
-    **/
-    //vector<vector<int>> vec( n , vector<int> (m, 0));
-    vector<double> ret(features.size());
-    for (int i = 0; i < features.size(); i++) {
-        ret[i] = features[i] * weights[i]; //matVecMult(features, weights);
-    }
-    return ret;
-}
-
-vector<double> vecDivScalar(vector<double> one, double scal) {
-    for (int i = 0; i < one.size(); i++) {
-        one[i] = one[i] / scal;
-    }
-    return one;
-}
-
-vector<double> vecMultScalar(vector<double> one, double scal) {
-    for (int i = 0; i < one.size(); i++) {
-        one[i] = one[i] * scal;
-    }
-    return one;
-}
-
-vector<double> vecSub(vector<double> one, vector<double> two) {
-    for (int i = 0; i < one.size(); i++) {
-        one[i] = one[i] - two[i];
-    }
-    return one;
-}
-
-vector<double> vecSums(vector<double> one, vector<double> two) {
-    for (int i = 0; i < one.size(); i++) {
-        one[i] = one[i] + two[i];
-    }
-    return one;
-}
 
 /*
 * Need vectors:
@@ -195,16 +142,16 @@ double accuracy(vector<double> test, vector< vector<double> > preds) {
         else {
             max = sec;
         }
-        if (max < 0.5) {
+        if (max <= 0.776) {
+            if (test[i] == 0) {
+                acc++;
+            }
+        }else {
             if (test[i] == 1) {
                 acc++;
             }
         }
-        else {
-            if (test[i] == 0) {
-                acc++;
-            }
-        }
+        cout << max << " " << test[i]  << " " << acc << endl;
     }
     return acc / test.size();
 }
@@ -217,7 +164,7 @@ vector< vector<double> > posteriorDiscreteSex(vector<double> sex, vector<double>
     double diedNum = 0;
     double surviveNum = 0;
     for(int i = 0; i < survived.size(); i++){
-        if(sex[i] == 0){
+        if(sex[i] == 1){
             if(survived[i] == 1){
                 ms++;
                 surviveNum++;
@@ -226,7 +173,7 @@ vector< vector<double> > posteriorDiscreteSex(vector<double> sex, vector<double>
                 diedNum++;
             }
         }
-        if(sex[i] == 1){
+        if(sex[i] == 0){
             if(survived[i] == 1){
                 fs++;
                 surviveNum++;
@@ -433,12 +380,6 @@ vector <double> naiveBayes(double pclass, double sex, double age,
 
     double denom = featureProbsS + featureProbsD;
 
-    cout << "featuresProbs " << featureProbsS << endl;
-    cout << "denom " << denom << endl;
-    cout << "featreProbsD " << featureProbsD << endl;
-
-
-
     return { featureProbsS / denom, featureProbsD / denom };
 }
 
@@ -480,13 +421,13 @@ int main() {
     cout << "=================================================" << endl;
     for (auto i : weightsPclass) {
         for (auto j : i) {
-            cout << j;
+            cout << j << " ";
         }
     }
     cout << endl;
     for (auto i : weightsSex) {
         for (auto j : i) {
-            cout << j;
+            cout << j << " ";
         }
     }
     cout << endl;
@@ -499,7 +440,7 @@ int main() {
     cout << endl;
 
     for (auto i : aprioriS) {
-            cout << i;
+            cout << i << " ";
     }
     cout << endl;
     cout << "=================================================" << endl;
@@ -515,11 +456,6 @@ int main() {
         double pclassi = testPclass[i];
         testProbs.push_back(naiveBayes(pclassi, sexi, agei, aprioriS, weightsPclass, weightsSex, weightsAge));
         //cout << "age " << agei << " pclass " << pclassi << endl;
-    }
-    for (auto i : weightsSex) {
-        for (auto j : i) {
-            cout << j;
-        }
     }
     cout << endl;
     for (int i = 0; i < testProbs.size()-1; i++) {
