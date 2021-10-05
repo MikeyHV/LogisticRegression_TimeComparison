@@ -303,7 +303,7 @@ double vectorSum(const std::vector<double>& inputVector) {
 double vectorMean(const std::vector<double>& inputVector) {
     double mean = 0;
     double sum = vectorSum(inputVector);
-    mean = sum / inputVector.size();
+    double mean = sum / inputVector.size();
     return mean;
 }
 
@@ -319,13 +319,13 @@ double vectorVariance(const std::vector<double>& inputVector) {
     for (int i = 0; i < n; i++) {
         xSum += inputVector[i];
     }
-    xAvg = xSum / n;
+    double xAvg = xSum / n;
 
     //calculate variance
     for (int i = 0; i < n; i++) {
         summation += ((inputVector[i] - xAvg) * (inputVector[i] - xAvg)); //(xi - xAvg)
     }
-    variance = summation / (n - 1);
+    double variance = summation / (n - 1);
     return variance;
 }
 
@@ -372,12 +372,12 @@ vector< vector<double> > likelihoodContinuous(vector<double> age, vector<double>
     ret.push_back(agesMean);
     ret.push_back(agesVar);
 
-    return ret; //ret[0] = likelihoodAgeSurvived, ret[1] = likelihoodAgeNotSurvived
+    return ret;
 }
 
 double calcPAge(double age, double mean, double var){
-    expNumerator = -1 * pow((instance - mean), 2);
-    expDenominator = 2 * variance;
+    double expNumerator = -1 * pow((instance - mean), 2);
+    double expDenominator = 2 * variance;
     return 1 / sqrt(2 * myPi * variance) * exp(expNumerator / expDenominator);
 }
 
@@ -448,10 +448,12 @@ int main() {
     // this is a nx2 vector. each row is an instance, column 1 is dead, 2 is survived.
 
     for(int i = 0; i < testSex.size(); i++){
-        sexi = testSex[i];
-        agei = testAge[i];
-        pclassi = testPclass[i];
-        survivedi = testSurvived[i];
+        double sexi = testSex[i];
+        double agei = testAge[i];
+        double pclassi = testPclass[i];
+        double survivedi = testSurvived[i];
         testProbs.append(naiveBayes(pclassi, sexi, agei, survivedi, weightsPclass, weightsSex, weightsAge));
+        print(testProbs[i]);
     }
+
 };
