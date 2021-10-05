@@ -5,16 +5,16 @@
 #include <algorithm>
 #include <math.h>
 #include <string>
-
+#include <chrono>
 
 const int MAX_LEN = 10000;
 //const int NUM_ROWS = 4; //for temp matrix, we will later transpose it
 
 //holds all values
-std::vector<double> pclass(MAX_LEN);
-std::vector<double> survived(MAX_LEN);
-std::vector<double> sex(MAX_LEN);
-std::vector<double> age(MAX_LEN);
+std::vector<double> pclassGlobal(MAX_LEN);
+std::vector<double> survivedGlobal(MAX_LEN);
+std::vector<double> sexGlobal(MAX_LEN);
+std::vector<double> ageGlobal(MAX_LEN);
 
 //train subset
 std::vector<double> trainPclass(MAX_LEN);
@@ -33,6 +33,88 @@ using namespace std;
 
 using namespace std;
 
+
+double sensitivity(vector<double> predicted, vector<double> actual) {
+    double numTruePos = 0;
+    double numActuallyTrue = 0;
+    for (int i = 0; i < predicted.size(); i++) {
+        if (predicted[i] == actual[i] == 1) {
+            numTruePos++;
+        }
+        if (actual[i] == 1) {
+            numActuallyTrue++;
+        }
+    }
+    return numTruePos / numActuallyTrue * 100;
+}
+
+double specificity(vector<double> predicted, vector<double> actual) {
+    double numTrueNeg = 0;
+    double numActuallyNeg = 0;
+    for (int i = 0; i < predicted.size(); i++) {
+        if (predicted[i] == actual[i] == 0) {
+            numTrueNeg++;
+        }
+        if (actual[i] == 0) {
+            numActuallyNeg++;
+        }
+    }
+    return numTrueNeg / numActuallyNeg * 100;
+}
+
+double sumVec(vector<double> one) {
+    /*
+    takes in an nx1
+    returns a scalar
+    */
+    double sum = 0;
+    for (int i = 0; i < one.size(); i++) {
+        one[i] = one[i] + sum;
+    }
+    return(sum);
+}
+
+vector<double> dotProduct(vector<double> features, vector<double> weights) {
+    /**
+     * takes in a nxm vector one
+     * and a mx1 vector two
+     * returns a nx1 vector ret
+    **/
+    //vector<vector<int>> vec( n , vector<int> (m, 0));
+    vector<double> ret(features.size());
+    for (int i = 0; i < features.size(); i++) {
+        ret[i] = features[i] * weights[i]; //matVecMult(features, weights);
+    }
+    return ret;
+}
+
+vector<double> vecDivScalar(vector<double> one, double scal) {
+    for (int i = 0; i < one.size(); i++) {
+        one[i] = one[i] / scal;
+    }
+    return one;
+}
+
+vector<double> vecMultScalar(vector<double> one, double scal) {
+    for (int i = 0; i < one.size(); i++) {
+        one[i] = one[i] * scal;
+    }
+    return one;
+}
+
+vector<double> vecSub(vector<double> one, vector<double> two) {
+    for (int i = 0; i < one.size(); i++) {
+        one[i] = one[i] - two[i];
+    }
+    return one;
+}
+
+vector<double> vecSums(vector<double> one, vector<double> two) {
+    for (int i = 0; i < one.size(); i++) {
+        one[i] = one[i] + two[i];
+    }
+    return one;
+}
 
 /*
 * Need vectors:
@@ -74,18 +156,18 @@ bool readCsv(std::string fileName) {
         getline(inFS, age_in, '\n');
 
 
-        pclass.at(numObservations) = std::stoi(pclass_in);
-        survived.at(numObservations) = std::stoi(survived_in);
-        sex.at(numObservations) = std::stoi(sex_in);
-        age.at(numObservations) = std::stof(age_in);
+        pclassGlobal.at(numObservations) = std::stoi(pclass_in);
+        survivedGlobal.at(numObservations) = std::stoi(survived_in);
+        sexGlobal.at(numObservations) = std::stoi(sex_in);
+        ageGlobal.at(numObservations) = std::stof(age_in);
 
         numObservations++;
     }
 
-    pclass.resize(numObservations);
-    survived.resize(numObservations);
-    sex.resize(numObservations);
-    age.resize(numObservations);
+    pclassGlobal.resize(numObservations);
+    survivedGlobal.resize(numObservations);
+    sexGlobal.resize(numObservations);
+    ageGlobal.resize(numObservations);
 
 
     std::cout << "Closing file " << fileName << std::endl;
@@ -130,11 +212,12 @@ double accuracy(vector<double> test, vector< vector<double> > preds) {
      * two nx1 vectors
      **/
     double acc = 0;
-    vector<double> corr;
+    vector<double> predictionsAsFactor(0);
 
     for (int i = 0; i < test.size(); i++) {
         double fir = preds[i][0];
         double sec = preds[i][1];
+        
         double max = fir;
         if (fir > sec) {
             max = fir;
@@ -142,17 +225,22 @@ double accuracy(vector<double> test, vector< vector<double> > preds) {
         else {
             max = sec;
         }
-        if (max <= 0.776) {
-            if (test[i] == 0) {
-                acc++;
-            }
-        }else {
+        //std::cout << max << ", " << test[i] << endl;
+        if (max < 0.775) {
             if (test[i] == 1) {
                 acc++;
             }
+            predictionsAsFactor.push_back(1);
         }
-        cout << max << " " << test[i]  << " " << acc << endl;
+        else {
+            if (test[i] == 0) {
+                acc++;
+            }
+            predictionsAsFactor.push_back(0);
+        }
     }
+    std::cout << "sensitivity: " << sensitivity(predictionsAsFactor, test) << std::endl;
+    std::cout << "specificity: " << specificity(predictionsAsFactor, test) << std::endl;
     return acc / test.size();
 }
 
@@ -268,7 +356,7 @@ double vectorVariance(const std::vector<double>& inputVector) {
     double summation = 0;
     double xAvg = 0;
     double xSum = 0;
-    int n = inputVector.size();
+    long n = inputVector.size();
     double variance = 0;
 
     //calculate avg
@@ -281,8 +369,11 @@ double vectorVariance(const std::vector<double>& inputVector) {
     for (int i = 0; i < n; i++) {
         summation += ((inputVector[i] - xAvg) * (inputVector[i] - xAvg)); //(xi - xAvg)
     }
-    variance = summation / (n - 1);
+    long one = static_cast<long>(1);
+    variance = summation / (n - one);
     return variance;
+    //return sqrt(variance);
+   
 }
 
 //computes likelihood of continuous vector
@@ -301,8 +392,8 @@ vector<double> likelihoodContinuous1d(vector<double> x) {
         temp = 1 / sqrt(2 * myPi * variance) * exp(expNumerator / expDenominator);
         likelihoods.push_back(temp);
     }
-    cout << "age mean " << mean << endl;
-    cout << "age variance " << variance << endl;
+    std::cout << "age mean " << mean << endl;
+    std::cout << "age variance " << variance << endl;
     return likelihoods;
 }
 
@@ -361,6 +452,7 @@ vector <double> naiveBayes(double pclass, double sex, double age,
     vector<double> agesMean = weightsAge[0];
     vector<double> agesVar = weightsAge[1];
 
+
     int intPclass = pclass;
     int intSex = sex;
 
@@ -380,8 +472,15 @@ vector <double> naiveBayes(double pclass, double sex, double age,
 
     double denom = featureProbsS + featureProbsD;
 
+    //cout << "featuresProbs " << featureProbsS << endl;
+    //cout << "denom " << denom << endl;
+    //cout << "featreProbsD " << featureProbsD << endl;
+
+
+
     return { featureProbsS / denom, featureProbsD / denom };
 }
+
 
 /**
  * 
@@ -409,43 +508,46 @@ int main() {
         return 1;
     }
     //split data into train and test
-    splitData(900, pclass, trainPclass, testPclass);
-    splitData(900, survived, trainSurvived, testSurvived);
-    splitData(900, sex, trainSex, testSex);
-    splitData(900, age, trainAge, testAge);
+    splitData(900, pclassGlobal, trainPclass, testPclass);
+    splitData(900, survivedGlobal, trainSurvived, testSurvived);
+    splitData(900, sexGlobal, trainSex, testSex);
+    splitData(900, ageGlobal, trainAge, testAge);
+
+    //algorithm start time
+    auto start = chrono::high_resolution_clock::now();
 
     vector< vector<double> > weightsPclass = posteriorDiscretePClass(trainPclass, trainSurvived);
     vector< vector<double> > weightsSex = posteriorDiscreteSex(trainSex, trainSurvived);
     vector< vector<double> > weightsAge = likelihoodContinuous(trainAge, trainSurvived);
     vector< double > aprioriS = apriori(trainSurvived);
-    cout << "=================================================" << endl;
-    for (auto i : weightsPclass) {
-        for (auto j : i) {
-            cout << j << " ";
-        }
+   
+    std::cout << "=================================================" << endl;
+    std::cout << endl;
+    std::cout << "Likelihood for p(pclass|survived)" << endl;
+    for (int i = 0; i < 2; i++) {
+        std::cout << weightsPclass[i][0] << " " << weightsPclass[i][1] << " " << weightsPclass[i][2] << endl;
     }
-    cout << endl;
-    for (auto i : weightsSex) {
-        for (auto j : i) {
-            cout << j << " ";
-        }
+    std::cout << endl;
+    std::cout << "Likelihood for p(sex|survived)" << endl;
+    for (int i = 0; i < 2; i++) {
+        std::cout << weightsSex[i][0] << " " << weightsSex[i][1] << endl;
     }
-    cout << endl;
+    std::cout << endl;
+    std::cout << "Mean" << endl;
+    std::cout << weightsAge[0][0] << " " << weightsAge[0][1] << endl;
+    std::cout << endl;
 
-    for (auto i : weightsAge) {
-        for (auto j : i) {
-            cout << j << " ";
-        }
-    }
-    cout << endl;
+    std::cout << "Variance" << endl;
+    std::cout << weightsAge[1][0] << " " << weightsAge[1][1] << endl;
+    std::cout << endl;
 
-    for (auto i : aprioriS) {
-            cout << i << " ";
-    }
-    cout << endl;
-    cout << "=================================================" << endl;
+    std::cout << "Apirori" << endl;
+    std::cout << aprioriS[0] << " " << aprioriS[1] << endl;
 
-    
+    std::cout << endl;
+    std::cout << "=================================================" << endl;
+
+   
 
     vector< vector<double> > testProbs;
     // this is a nx2 vector. each row is an instance, column 1 is dead, 2 is survived.
@@ -457,11 +559,51 @@ int main() {
         testProbs.push_back(naiveBayes(pclassi, sexi, agei, aprioriS, weightsPclass, weightsSex, weightsAge));
         //cout << "age " << agei << " pclass " << pclassi << endl;
     }
-    cout << endl;
+
+    //end/stop algorithm time
+    auto stop = chrono::high_resolution_clock::now();
+    auto duration = chrono::duration_cast<chrono::microseconds>(stop - start);
+    std::cout << "Time taken by function: " << duration.count() << " microseconds" << endl;
+    /*
+    for (auto i : weightsSex) {
+        for (auto j : i) {
+            std::cout << j;
+        }
+    }
+    std::cout << endl;
     for (int i = 0; i < testProbs.size()-1; i++) {
         
-        //cout << testProbs[i][0] << ", " << testProbs[i][1] << endl;
+        std::cout << testProbs[i][0] << ", " << testProbs[i][1] << ", " << testSurvived[i] << endl;
     }
-    cout << accuracy(testSurvived, testProbs) << endl;
+    */
+    std::cout << accuracy(testSurvived, testProbs) << endl;
+    
+    //test 
+    double acc = 0;
+    vector<double> corr;
+
+    for (int i = 0; i < testSurvived.size(); i++) {
+        double fir = testProbs[i][0];
+        double sec = testProbs[i][1];
+
+        double max = fir;
+        if (fir > sec) {
+            max = fir;
+        }
+        else {
+            max = sec;
+        }
+        std::cout << max << ", " << testSurvived[i] << endl;
+        if (max < 0.5) {
+            if (testSurvived[i] == 1) {
+                acc++;
+            }
+        }
+        else {
+            if (testSurvived[i] == 0) {
+                acc++;
+            }
+        }
+    }
 
 };
