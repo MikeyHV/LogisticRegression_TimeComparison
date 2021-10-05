@@ -178,7 +178,7 @@ std::vector<double> vecSubtract(std::vector<double> vec1, std::vector<double> ve
     return ret;
 }
 
-double accuracy(vector<double> test, vector<double> preds) {
+double accuracy(vector<double> test, vector< vector<double> > preds) {
     /**
      * two nx1 vectors
      **/
@@ -188,7 +188,13 @@ double accuracy(vector<double> test, vector<double> preds) {
     for (int i = 0; i < test.size(); i++) {
         double fir = preds[i][0];
         double sec = preds[i][1];
-        double max = max(fir, sec);
+        double max = fir;
+        if (fir > sec) {
+            max = fir;
+        }
+        else {
+            max = sec;
+        }
         if (max < 0.5) {
             if (test[i] == 1) {
                 acc++;
@@ -471,7 +477,7 @@ int main() {
     vector< vector<double> > weightsSex = posteriorDiscreteSex(trainSex, trainSurvived);
     vector< vector<double> > weightsAge = likelihoodContinuous(trainAge, trainSurvived);
     vector< double > aprioriS = apriori(trainSurvived);
-    /*
+    cout << "=================================================" << endl;
     for (auto i : weightsPclass) {
         for (auto j : i) {
             cout << j;
@@ -496,7 +502,9 @@ int main() {
             cout << i;
     }
     cout << endl;
-    */
+    cout << "=================================================" << endl;
+
+    
 
     vector< vector<double> > testProbs;
     // this is a nx2 vector. each row is an instance, column 1 is dead, 2 is survived.
