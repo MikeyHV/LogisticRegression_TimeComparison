@@ -186,7 +186,10 @@ double accuracy(vector<double> test, vector<double> preds) {
     vector<double> corr;
 
     for (int i = 0; i < test.size(); i++) {
-        if (preds[i] < 0.5) {
+        double fir = preds[i][0];
+        double sec = preds[i][1];
+        double max = max(fir, sec);
+        if (max < 0.5) {
             if (test[i] == 1) {
                 acc++;
             }
@@ -512,6 +515,9 @@ int main() {
     }
     cout << endl;
     for (int i = 0; i < testProbs.size()-1; i++) {
-        cout << testProbs[i][0] << ", " << testProbs[i][1] << endl;
+        
+        //cout << testProbs[i][0] << ", " << testProbs[i][1] << endl;
     }
+    cout << accuracy(testSurvived, testProbs) << endl;
+
 };
