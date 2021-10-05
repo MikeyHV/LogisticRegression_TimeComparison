@@ -520,6 +520,11 @@ int main() {
     vector< vector<double> > weightsSex = posteriorDiscreteSex(trainSex, trainSurvived);
     vector< vector<double> > weightsAge = likelihoodContinuous(trainAge, trainSurvived);
     vector< double > aprioriS = apriori(trainSurvived);
+
+    //end/stop algorithm time
+    auto stop = chrono::high_resolution_clock::now();
+    auto duration = chrono::duration_cast<chrono::microseconds>(stop - start);
+    std::cout << "Time taken by function: " << duration.count() << " microseconds" << endl;
    
     std::cout << "=================================================" << endl;
     std::cout << endl;
@@ -560,10 +565,7 @@ int main() {
         //cout << "age " << agei << " pclass " << pclassi << endl;
     }
 
-    //end/stop algorithm time
-    auto stop = chrono::high_resolution_clock::now();
-    auto duration = chrono::duration_cast<chrono::microseconds>(stop - start);
-    std::cout << "Time taken by function: " << duration.count() << " microseconds" << endl;
+
     /*
     for (auto i : weightsSex) {
         for (auto j : i) {
