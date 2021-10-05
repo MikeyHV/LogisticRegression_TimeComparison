@@ -231,7 +231,7 @@ vector< vector<double> > posteriorDiscreteSex(vector<double> sex, vector<double>
     double probfS = fs/surviveNum;
     double probmD = md/diedNum;
     double probfD = fd/diedNum;
-    vector< vector<double> > fin { { probmS, probfS }
+    vector< vector<double> > fin { { probmS, probfS },
                                     { probmD, probfD } };
     return fin;
 }
@@ -285,7 +285,7 @@ vector< vector<double> > posteriorDiscretePClass(vector<double> pclass, vector<d
     double prob1D = oned/diedNum;
     double prob2D = twod/diedNum;
     double prob3D = threed/diedNum;
-    vector< vector<double> > fin { { prob1S, prob2S, prob3S }
+    vector< vector<double> > fin { { prob1S, prob2S, prob3S },
                                     { prob1D, prob2D, prob3D } };
     return fin;
 }
@@ -303,7 +303,7 @@ double vectorSum(const std::vector<double>& inputVector) {
 double vectorMean(const std::vector<double>& inputVector) {
     double mean = 0;
     double sum = vectorSum(inputVector);
-    double mean = sum / inputVector.size();
+    mean = sum / inputVector.size();
     return mean;
 }
 
@@ -319,13 +319,13 @@ double vectorVariance(const std::vector<double>& inputVector) {
     for (int i = 0; i < n; i++) {
         xSum += inputVector[i];
     }
-    double xAvg = xSum / n;
+    xAvg = xSum / n;
 
     //calculate variance
     for (int i = 0; i < n; i++) {
         summation += ((inputVector[i] - xAvg) * (inputVector[i] - xAvg)); //(xi - xAvg)
     }
-    double variance = summation / (n - 1);
+    variance = summation / (n - 1);
     return variance;
 }
 
@@ -365,20 +365,21 @@ vector< vector<double> > likelihoodContinuous(vector<double> age, vector<double>
     }
 
     //calculate likelihoods
-    vector<double> agesMean = { vectorMean(notSurvivedAges), vectorMean(survivedAges) }
-    vector<double> agesVar = { vectorVariance(notSurvivedAges), vectorVariance(survivedAges) }
+    vector<double> agesMean = { vectorMean(notSurvivedAges), vectorMean(survivedAges) };
+    vector<double> agesVar = { vectorVariance(notSurvivedAges), vectorVariance(survivedAges) };
 
     vector< vector<double> > ret(0);
     ret.push_back(agesMean);
     ret.push_back(agesVar);
 
-    return ret;
+    return ret; //ret[0] = likelihoodAgeSurvived, ret[1] = likelihoodAgeNotSurvived
 }
 
 double calcPAge(double age, double mean, double var){
-    double expNumerator = -1 * pow((instance - mean), 2);
-    double expDenominator = 2 * variance;
-    return 1 / sqrt(2 * myPi * variance) * exp(expNumerator / expDenominator);
+    double expNumerator = -1 * pow((age - mean), 2);
+    double expDenominator = 2 * var;
+    double myPi = atan(1) * 4;
+    return 1 / sqrt(2 * myPi * var) * exp(expNumerator / expDenominator);
 }
 
 vector <double> naiveBayes(double pclass, double sex, double age, 
@@ -390,15 +391,15 @@ vector <double> naiveBayes(double pclass, double sex, double age,
     vector<double> agesMean = weightsAge[0];
     vector<double> agesVar = weightsAge[1];
 
-    double pclassS = weightsPclass[1, pclass];
-    double sexS = weightsSex[1, sex];
+    double pclassS = weightsPclass[1][pclass];
+    double sexS = weightsSex[1][sex];
     double ageS = calcPAge(age, agesMean[1], agesVar[1]);
 
-    double pclassD = weightsPclass[0, pclass];
-    double sexD = weightsSex[0, sex];
+    double pclassD = weightsPclass[0][pclass];
+    double sexD = weightsSex[0] [sex];
     double ageD = calcPAge(age, agesMean[0], agesVar[0]);
 
-    double pS = surivved[1];
+    double pS = survived[1];
     double pD = survived[0];
 
     double featureProbsS = pclassS * sexS * ageS * pS;
@@ -452,8 +453,6 @@ int main() {
         double agei = testAge[i];
         double pclassi = testPclass[i];
         double survivedi = testSurvived[i];
-        testProbs.append(naiveBayes(pclassi, sexi, agei, survivedi, weightsPclass, weightsSex, weightsAge));
-        print(testProbs[i]);
+        testProbs.push_back(naiveBayes(pclassi, sexi, agei, survivedi, weightsPclass, weightsSex, weightsAge));
     }
-
 };
