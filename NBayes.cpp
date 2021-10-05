@@ -458,6 +458,7 @@ int main() {
     vector< vector<double> > weightsPclass = posteriorDiscretePClass(trainPclass, trainSurvived);
     vector< vector<double> > weightsSex = posteriorDiscreteSex(trainSex, trainSurvived);
     vector< vector<double> > weightsAge = likelihoodContinuous(trainAge, trainSurvived);
+    vector< double > aprioriS = apriroi(trainSurvived);
 
     vector< vector<double> > testProbs;
     // this is a nx2 vector. each row is an instance, column 1 is dead, 2 is survived.
@@ -466,7 +467,6 @@ int main() {
         double sexi = testSex[i];
         double agei = testAge[i];
         double pclassi = testPclass[i];
-        double survivedi = testSurvived[i];
-        testProbs.push_back(naiveBayes(pclassi, sexi, agei, survivedi, weightsPclass, weightsSex, weightsAge));
+        testProbs.push_back(naiveBayes(pclassi, sexi, agei, aprioriS, weightsPclass, weightsSex, weightsAge));
     }
 };
