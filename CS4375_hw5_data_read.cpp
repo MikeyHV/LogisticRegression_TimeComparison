@@ -435,15 +435,18 @@ double accuracy(vector<double> test, vector<double> preds) {
      **/
     double acc = 0;
     vector<double> corr;
-
+    double sum1 = 0;
+    double num1 = 0;
+    double num2 = 0;
+    double sum2 = 0;
     for (int i = 0; i < test.size(); i++) {
-        if (preds[i] < 0.5) {
-            if (test[i] == 0) {
+        if (preds[i] < 0.70) {
+            if (test[i] == 1) {
                 acc++;
             }
         }
         else {
-            if (test[i] == 1) {
+            if (test[i] == 0) {
                 acc++;
             }
         }
@@ -545,7 +548,7 @@ int main() {
 
         vector<double> weights(trainPclass.size());
         fill(weights.begin(), weights.end(), 0.5);
-        vector<double> trainedWeights = trainModel(trainPclass, trainSurvived, weights, 0.5, 5000);
+        vector<double> trainedWeights = trainModel(trainPclass, trainSurvived, weights, 0.5, 50);
 
         /**
          * features is an array of size nx1

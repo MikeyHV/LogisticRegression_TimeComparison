@@ -33,145 +33,6 @@ using namespace std;
 
 using namespace std;
 
-//returns summation of parameter inputVector 
-double vectorSum(const std::vector<double>& inputVector) {
-    double sum = 0;
-    for (double curr : inputVector) {
-        sum += curr;
-    }
-    return sum;
-}
-
-//returns mean of parameter inputVector 
-double vectorMean(const std::vector<double>& inputVector) {
-    double mean = 0;
-    double sum = vectorSum(inputVector);
-    mean = sum / inputVector.size();
-    return mean;
-}
-
-//returns variance of vector parameter inputVector
-double vectorVariance(const std::vector<double>& inputVector) {
-    double summation = 0;
-    double xAvg = 0;
-    double xSum = 0;
-    int n = inputVector.size();
-    double variance = 0;
-
-    //calculate avg
-    for (int i = 0; i < n; i++) {
-        xSum += inputVector[i];
-    }
-    xAvg = xSum / n;
-
-    //calculate variance
-    for (int i = 0; i < n; i++) {
-        summation += ((inputVector[i] - xAvg) * (inputVector[i] - xAvg)); //(xi - xAvg)
-    }
-    variance = summation / (n - 1);
-    return variance;
-}
-
-//computes likelihood of continuous vector
-vector<double> likelihoodContinuous1d(vector<double> x) {
-    double mean = vectorMean(x);
-    double variance = vectorVariance(x);
-    double myPi = atan(1) * 4; //pi
-
-    vector<double> likelihoods(0);
-    double expNumerator;
-    double expDenominator;
-    double temp; 
-    for (double instance : x) {
-        expNumerator = -1 * pow((instance - mean), 2);
-        expDenominator = 2 * variance;
-        temp = 1 / sqrt(2 * myPi * variance) * exp(expNumerator / expDenominator);
-        likelihoods.push_back(temp);
-    }
-    cout << "age mean " << mean << endl;
-    cout << "age variance " << variance << endl;
-    return likelihoods;
-}
-
-vector< vector<double> > likelihoodContinuous(vector<double> age, vector<double> survived) {
-    vector<double> survivedAges(0);
-    vector<double> notSurvivedAges(0);
-
-    //populate survived and notSurvived vectors
-    for (int i = 0; i < survived.size(); i ++) {
-        if (survived[i] == 1) { //if person survived, add their age to survivedAges
-            survivedAges.push_back(age[i]);
-        }
-        else {
-            notSurvivedAges.push_back(age[i]);
-        }
-    }
-
-    //calculate likelihoods
-    vector<double> likelihoodAgeSurvived = likelihoodContinuous1d(survivedAges);
-    vector<double> likelihoodAgeNotSurvived = likelihoodContinuous1d(notSurvivedAges);
-
-    vector< vector<double> > ret(0);
-    ret.push_back(likelihoodAgeSurvived);
-    ret.push_back(likelihoodAgeNotSurvived);
-
-    return ret; //ret[0] = likelihoodAgeSurvived, ret[1] = likelihoodAgeNotSurvived
-
-}
-
-double sumVec(vector<double> one) {
-    /*
-    takes in an nx1
-    returns a scalar
-    */
-    double sum = 0;
-    for (int i = 0; i < one.size(); i++) {
-        one[i] = one[i] + sum;
-    }
-    return(sum);
-}
-
-vector<double> dotProduct(vector<double> features, vector<double> weights) {
-    /**
-     * takes in a nxm vector one
-     * and a mx1 vector two
-     * returns a nx1 vector ret
-    **/
-    //vector<vector<int>> vec( n , vector<int> (m, 0));
-    vector<double> ret(features.size());
-    for (int i = 0; i < features.size(); i++) {
-        ret[i] = features[i] * weights[i]; //matVecMult(features, weights);
-    }
-    return ret;
-}
-
-vector<double> vecDivScalar(vector<double> one, double scal) {
-    for (int i = 0; i < one.size(); i++) {
-        one[i] = one[i] / scal;
-    }
-    return one;
-}
-
-vector<double> vecMultScalar(vector<double> one, double scal) {
-    for (int i = 0; i < one.size(); i++) {
-        one[i] = one[i] * scal;
-    }
-    return one;
-}
-
-vector<double> vecSub(vector<double> one, vector<double> two) {
-    for (int i = 0; i < one.size(); i++) {
-        one[i] = one[i] - two[i];
-    }
-    return one;
-}
-
-vector<double> vecSums(vector<double> one, vector<double> two) {
-    for (int i = 0; i < one.size(); i++) {
-        one[i] = one[i] + two[i];
-    }
-    return one;
-}
 
 double sensitivity(vector<double> predicted, vector<double> actual) {
     double numTruePos = 0;
@@ -346,7 +207,7 @@ std::vector<double> vecSubtract(std::vector<double> vec1, std::vector<double> ve
     return ret;
 }
 
-double accuracy(vector<double> test, vector<double> preds) {
+double accuracy(vector<double> test, vector< vector<double> > preds) {
     /**
      * two nx1 vectors
      **/
@@ -354,17 +215,6 @@ double accuracy(vector<double> test, vector<double> preds) {
     vector<double> predictionsAsFactor(0);
 
     for (int i = 0; i < test.size(); i++) {
-<<<<<<< Updated upstream
-        if (preds[i] < 0.5) {
-            if (test[i] == 1) {
-                acc++;
-            }
-        }
-        else {
-            if (test[i] == 0) {
-                acc++;
-            }
-=======
         double fir = preds[i][0];
         double sec = preds[i][1];
         
@@ -387,7 +237,6 @@ double accuracy(vector<double> test, vector<double> preds) {
                 acc++;
             }
             predictionsAsFactor.push_back(0);
->>>>>>> Stashed changes
         }
     }
     std::cout << "sensitivity: " << sensitivity(predictionsAsFactor, test) << std::endl;
@@ -403,7 +252,7 @@ vector< vector<double> > posteriorDiscreteSex(vector<double> sex, vector<double>
     double diedNum = 0;
     double surviveNum = 0;
     for(int i = 0; i < survived.size(); i++){
-        if(pclass[i] == 0){
+        if(sex[i] == 1){
             if(survived[i] == 1){
                 ms++;
                 surviveNum++;
@@ -412,7 +261,7 @@ vector< vector<double> > posteriorDiscreteSex(vector<double> sex, vector<double>
                 diedNum++;
             }
         }
-        if(pclass[i] == 1){
+        if(sex[i] == 0){
             if(survived[i] == 1){
                 fs++;
                 surviveNum++;
@@ -426,8 +275,8 @@ vector< vector<double> > posteriorDiscreteSex(vector<double> sex, vector<double>
     double probfS = fs/surviveNum;
     double probmD = md/diedNum;
     double probfD = fd/diedNum;
-    vector< vector<double> > fin { { probmS, probfS }
-                                    { probmD, probfD } };
+    vector< vector<double> > fin { { probmD, probfD },
+                                    { probmS, probfS } };
     return fin;
 }
 
@@ -480,19 +329,11 @@ vector< vector<double> > posteriorDiscretePClass(vector<double> pclass, vector<d
     double prob1D = oned/diedNum;
     double prob2D = twod/diedNum;
     double prob3D = threed/diedNum;
-    vector< vector<double> > fin { { prob1S, prob2S, prob3S }
-                                    { prob1D, prob2D, prob3D } };
+    vector< vector<double> > fin { { prob1D, prob2D, prob3D },
+                                    { prob1S, prob2S, prob3S } };
     return fin;
 }
 
-<<<<<<< Updated upstream
-vector <double> naiveBayes(vector<double> pclass, vector<double> sex, vector<double> age, vector<double> survived){
-    vector< vector<double> > postSex = posteriorDiscreteSex(sex, survived);
-    
-    vector< vector<double> > postClass = posteriorDiscretePClass(pclass, survived);
-
-    
-=======
 //returns summation of parameter inputVector 
 double vectorSum(const std::vector<double>& inputVector) {
     double sum = 0;
@@ -638,7 +479,6 @@ vector <double> naiveBayes(double pclass, double sex, double age,
 
 
     return { featureProbsS / denom, featureProbsD / denom };
->>>>>>> Stashed changes
 }
 
 
@@ -676,8 +516,6 @@ int main() {
     //algorithm start time
     auto start = chrono::high_resolution_clock::now();
 
-<<<<<<< Updated upstream
-=======
     vector< vector<double> > weightsPclass = posteriorDiscretePClass(trainPclass, trainSurvived);
     vector< vector<double> > weightsSex = posteriorDiscreteSex(trainSex, trainSurvived);
     vector< vector<double> > weightsAge = likelihoodContinuous(trainAge, trainSurvived);
@@ -767,6 +605,5 @@ int main() {
             }
         }
     }
->>>>>>> Stashed changes
 
 };
