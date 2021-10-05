@@ -225,8 +225,8 @@ double accuracy(vector<double> test, vector< vector<double> > preds) {
         else {
             max = sec;
         }
-        //std::cout << max << ", " << test[i] << endl;
-        if (max < 0.775) {
+        //std::cout << max << ", " << test[i] << ", " << acc <<endl;
+        if (max > 0.775) {
             if (test[i] == 1) {
                 acc++;
             }
@@ -239,8 +239,8 @@ double accuracy(vector<double> test, vector< vector<double> > preds) {
             predictionsAsFactor.push_back(0);
         }
     }
-    std::cout << "sensitivity: " << sensitivity(predictionsAsFactor, test) << std::endl;
-    std::cout << "specificity: " << specificity(predictionsAsFactor, test) << std::endl;
+    std::cout << "Sensitivity: " << sensitivity(predictionsAsFactor, test) << std::endl;
+    std::cout << "Specificity: " << specificity(predictionsAsFactor, test) << std::endl;
     return acc / test.size();
 }
 
@@ -538,16 +538,13 @@ int main() {
     std::cout << endl;
 
     std::cout << "Variance" << endl;
-    std::cout << weightsAge[1][0] << " " << weightsAge[1][1] << endl;
+    std::cout << pow(weightsAge[1][0],0.5) << " " << pow(weightsAge[1][1],0.5) << endl;
     std::cout << endl;
 
     std::cout << "Apirori" << endl;
     std::cout << aprioriS[0] << " " << aprioriS[1] << endl;
 
     std::cout << endl;
-    std::cout << "=================================================" << endl;
-
-   
 
     vector< vector<double> > testProbs;
     // this is a nx2 vector. each row is an instance, column 1 is dead, 2 is survived.
@@ -564,6 +561,8 @@ int main() {
     auto stop = chrono::high_resolution_clock::now();
     auto duration = chrono::duration_cast<chrono::microseconds>(stop - start);
     std::cout << "Time taken by function: " << duration.count() << " microseconds" << endl;
+    
+   
     /*
     for (auto i : weightsSex) {
         for (auto j : i) {
@@ -576,8 +575,12 @@ int main() {
         std::cout << testProbs[i][0] << ", " << testProbs[i][1] << ", " << testSurvived[i] << endl;
     }
     */
-    std::cout << accuracy(testSurvived, testProbs) << endl;
-    
+    std::cout << endl;
+    double acc2 = accuracy(testSurvived, testProbs);
+    std::cout << "Accuracy: " <<  acc2 << endl;
+    std::cout << endl;
+    std::cout << "=================================================" << endl;
+    std::cout << endl;
     //test 
     double acc = 0;
     vector<double> corr;
@@ -593,7 +596,7 @@ int main() {
         else {
             max = sec;
         }
-        std::cout << max << ", " << testSurvived[i] << endl;
+        //std::cout << max << ", " << testSurvived[i] << endl;
         if (max < 0.5) {
             if (testSurvived[i] == 1) {
                 acc++;
