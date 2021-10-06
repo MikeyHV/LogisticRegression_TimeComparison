@@ -520,8 +520,13 @@ int main() {
     vector< vector<double> > weightsSex = posteriorDiscreteSex(trainSex, trainSurvived);
     vector< vector<double> > weightsAge = likelihoodContinuous(trainAge, trainSurvived);
     vector< double > aprioriS = apriori(trainSurvived);
+
+    //end/stop algorithm time
+    auto stop = chrono::high_resolution_clock::now();
+    auto duration = chrono::duration_cast<chrono::microseconds>(stop - start);
    
     std::cout << "=================================================" << endl;
+    std::cout << "Time taken by function: " << duration.count() << " microseconds" << endl;
     std::cout << endl;
     std::cout << "Likelihood for p(pclass|survived)" << endl;
     for (int i = 0; i < 2; i++) {
@@ -556,11 +561,6 @@ int main() {
         testProbs.push_back(naiveBayes(pclassi, sexi, agei, aprioriS, weightsPclass, weightsSex, weightsAge));
         //cout << "age " << agei << " pclass " << pclassi << endl;
     }
-
-    //end/stop algorithm time
-    auto stop = chrono::high_resolution_clock::now();
-    auto duration = chrono::duration_cast<chrono::microseconds>(stop - start);
-    std::cout << "Time taken by function: " << duration.count() << " microseconds" << endl;
     
    
     /*
@@ -578,7 +578,7 @@ int main() {
     std::cout << endl;
     double acc2 = accuracy(testSurvived, testProbs);
     std::cout << "Accuracy: " <<  acc2 << endl;
-    std::cout << endl;
+    //std::cout << endl;
     std::cout << "=================================================" << endl;
     std::cout << endl;
     //test 
