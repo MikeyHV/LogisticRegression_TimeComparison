@@ -34,34 +34,6 @@ using namespace std;
 using namespace std;
 
 
-double sensitivity(vector<double> predicted, vector<double> actual) {
-    double numTruePos = 0;
-    double numActuallyTrue = 0;
-    for (int i = 0; i < predicted.size(); i++) {
-        if (predicted[i] == actual[i] == 1) {
-            numTruePos++;
-        }
-        if (actual[i] == 1) {
-            numActuallyTrue++;
-        }
-    }
-    return numTruePos / numActuallyTrue * 100;
-}
-
-double specificity(vector<double> predicted, vector<double> actual) {
-    double numTrueNeg = 0;
-    double numActuallyNeg = 0;
-    for (int i = 0; i < predicted.size(); i++) {
-        if (predicted[i] == actual[i] == 0) {
-            numTrueNeg++;
-        }
-        if (actual[i] == 0) {
-            numActuallyNeg++;
-        }
-    }
-    return numTrueNeg / numActuallyNeg * 100;
-}
-
 double sumVec(vector<double> one) {
     /*
     takes in an nx1
@@ -86,34 +58,6 @@ vector<double> dotProduct(vector<double> features, vector<double> weights) {
         ret[i] = features[i] * weights[i]; //matVecMult(features, weights);
     }
     return ret;
-}
-
-vector<double> vecDivScalar(vector<double> one, double scal) {
-    for (int i = 0; i < one.size(); i++) {
-        one[i] = one[i] / scal;
-    }
-    return one;
-}
-
-vector<double> vecMultScalar(vector<double> one, double scal) {
-    for (int i = 0; i < one.size(); i++) {
-        one[i] = one[i] * scal;
-    }
-    return one;
-}
-
-vector<double> vecSub(vector<double> one, vector<double> two) {
-    for (int i = 0; i < one.size(); i++) {
-        one[i] = one[i] - two[i];
-    }
-    return one;
-}
-
-vector<double> vecSums(vector<double> one, vector<double> two) {
-    for (int i = 0; i < one.size(); i++) {
-        one[i] = one[i] + two[i];
-    }
-    return one;
 }
 
 /*
@@ -199,19 +143,15 @@ void splitData(int trainSize, std::vector<T>& original, std::vector<T>& train, s
 
 //helper function, returns dot product of 2 vectors
 
-std::vector<double> vecSubtract(std::vector<double> vec1, std::vector<double> vec2) {
-    std::vector<double> ret = std::vector<double>();
-    for (int i = 0; i < vec1.size(); i++) {
-        ret[i] = vec1[i] - vec2[i];
-    }
-    return ret;
-}
-
 double accuracy(vector<double> test, vector< vector<double> > preds) {
     /**
      * two nx1 vectors
      **/
     double acc = 0;
+    double onePred = 0;
+    double zeroPred = 0;
+    double oneTrue = 0;
+    double zeroTrue = 0;
     vector<double> predictionsAsFactor(0);
 
     for (int i = 0; i < test.size(); i++) {
@@ -229,18 +169,23 @@ double accuracy(vector<double> test, vector< vector<double> > preds) {
         if (max > 0.775) {
             if (test[i] == 1) {
                 acc++;
+                onePred++;
             }
-            predictionsAsFactor.push_back(1);
         }
         else {
             if (test[i] == 0) {
                 acc++;
+                zeroPred++;
             }
-            predictionsAsFactor.push_back(0);
+        }
+        if (test[i] == 0){
+            zeroTrue++;
+        }else{
+            oneTrue++;
         }
     }
-    std::cout << "Sensitivity: " << sensitivity(predictionsAsFactor, test) << std::endl;
-    std::cout << "Specificity: " << specificity(predictionsAsFactor, test) << std::endl;
+    std::cout << "Specificity: " << onePred/oneTrue << std::endl;
+    std::cout << "Sensitivity: " << zeroPred/zeroTrue << std::endl;
     return acc / test.size();
 }
 
@@ -548,8 +493,6 @@ int main() {
 
     std::cout << "Apirori" << endl;
     std::cout << aprioriS[0] << " " << aprioriS[1] << endl;
-
-    std::cout << endl;
 
     vector< vector<double> > testProbs;
     // this is a nx2 vector. each row is an instance, column 1 is dead, 2 is survived.

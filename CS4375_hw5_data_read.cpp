@@ -342,38 +342,6 @@ std::vector<double> vecSubtract(std::vector<double> vec1, std::vector<double> ve
 }
 
 
-double sensitivity(double predicted, double actual) {
-    double numTruePos = 0;
-    double numActuallyTrue = 0;
-    // for (int i = 0; i < predicted.size(); i++) {
-    //     if (predicted[i] == actual[i] == 1) {
-    //         numTruePos++;
-    //     }
-    //     if (actual[i] == 1) {
-    //         numActuallyTrue++;
-    //     }
-    // }
-
-    return numTruePos / numActuallyTrue * 100;
-}
-
-
-double specificity(double predicted, double actual) {
-    double numTrueNeg = 0;
-    double numActuallyNeg = 0;
-    // for (int i = 0; i < predicted.size(); i++) {
-    //     if (predicted[i] == actual[i] == 0) {
-    //         numTrueNeg++;
-    //     }
-    //     if (actual[i] == 0) {
-    //         numActuallyNeg++;
-    //     }
-    // }
-    return numTrueNeg / numActuallyNeg * 100;
-}
-
-
-
 double accuracy(vector<double> test, vector<double> preds) {
     /**
      * two nx1 vectors
@@ -410,8 +378,8 @@ double accuracy(vector<double> test, vector<double> preds) {
             oneTrue++;
         }
     }
-    std::cout << "Sensitivity: " << onePred/oneTrue << std::endl;
-    std::cout << "Specificity: " << zeroPred/zeroTrue << std::endl;
+    std::cout << "Specificity: " << onePred/oneTrue << std::endl;
+    std::cout << "Sensitivity: " << zeroPred/zeroTrue << std::endl;
     return acc / test.size();
 }
 
